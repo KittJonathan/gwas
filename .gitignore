@@ -2,4 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-data
+tutorial/tutorial_files
+tutorial/tutorial_output

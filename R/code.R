@@ -66,4 +66,12 @@ library(devtools)
 install.packages("http:::cran.r-project.org/src/contrib/Archive/postgwas/postgwas_1.11.tar.gz")
 
 # Specify parameters to be used in the data processing and analysis
-data.dir <- "data/tutorial_files/"
+data.dir <- "tutorial/tutorial_files/"
+output.dir <- "tutorial/tutorial_output/"
+
+# Input files
+gwas.fn <- lapply(c(bed = "bed", bim = "bim", fam = "fam", gds = "gds"),
+                  function(n) sprintf("%s/chr16_1000g_CEU.%s", data.dir, n))
+onethou.fn <- lapply(c(info = "info", ped = "ped"),
+                     function(n) sprintf("%s/chr16_1000g_CEU/%s", data.dir, n))
+protein.coding.coords.fname <- sprintf("%s/ProCodgene_coords.csv", output.dir)
