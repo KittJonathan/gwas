@@ -82,3 +82,15 @@ gwaa.fname <- sprintf("%s/GWAStutorialout.txt", output.dir)
 gwaa.unadj.fname <- sprintf("%s/GWAStutorialoutUnadj.txt", output.dir)
 impute.out.fname <- sprintf("%s/GWAStutorial_imputationOut.csv", output.dir)
 CETP.fname <- sprintf("%s/CETP_GWASout.csv", output.dir)
+
+# Step 1 - Read and format data
+
+library(snpStats)
+
+geno <- snpStats::read.plink(bed = "tutorial/tutorial_files/GWAStutorial.bed",
+                             bim = "tutorial/tutorial_files/GWAStutorial.bim",
+                             fam = "tutorial/tutorial_files/GWAStutorial.fam",
+                             na.strings = ("-9"))
+
+genotype <- geno$genotypes
+print(genotype)
