@@ -1,19 +1,7 @@
-# A guide to genome-wide association analysis and post-analytic interrogation
-
-# https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6605
-
-# Last updated 2022-01-17
-
-# Links ----
+# Genome-wide association studies in R
 
 # https://poissonisfish.com/2017/10/09/genome-wide-association-studies-in-r/
-# https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6605
-# https://github.com/monogenea/GWAStutorial
-# https://cran.r-project.org/web/packages/statgenGWAS/vignettes/GWAS.html
-# https://biometris.github.io/statgenGWAS/index.html
-# https://www.nature.com/articles/s43586-021-00056-9
-# http://ww7.stat-gen.org/
-# https://www.mtholyoke.edu/courses/afoulkes/Data/GWAStutorial/
+
 
 # Workflow ----
 
