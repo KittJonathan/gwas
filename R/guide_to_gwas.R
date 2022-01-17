@@ -72,6 +72,7 @@ install.packages("http:::cran.r-project.org/src/contrib/Archive/postgwas/postgwa
 
 library(tidyverse)
 library(snpStats)
+library(SNPRelate)
 
 # Set paths ----
 
@@ -144,3 +145,57 @@ rm(clinical_file)
 # 2) low variability
 # 3) sample-level filtering (Step 3)
 # 4) possible genotyping errors
+
+# SNP-level filtering :
+# - call rate = for a given SNP, proportion of inviduals in the study for which the corresponding
+# SNP information is not missing (95% -> less than 5% of missing data)
+# - minor allele frequency (MAF) = a large degree of homogeneity at a given SNP
+# across study participants generally results in inedequate power to infer a statistically
+# significant relationship between the SNP and the trait under study (here, we remove SNPs
+# for which the MAF is less than 1%)
+
+# 2.1 - Create SNP summary statistics (MAF, call rate, ...)
+snp_summary <- snpStats::col.summary(genotypes)
+print(head(snp_summary))
+
+# 2.2 - set thresholds
+cr_threshold <- 0.95
+maf_threshold <- 0.01
+
+# 2.3 - filter on MAF and call rate & remove NAs
+use <- with(snp_summary, (!is.na(MAF) & MAF > maf_threshold) & Call.rate >= cr_threshold)
+use[is.na(use)] <- FALSE
+ncol(genotypes) - sum(use)  # 203,287 SNPs will be removed
+table(use)  # 658,186 SNPs will be kept / 203,287 SNPs will be removed
+
+# 2.4 - subset genotypes and SNP summary data for SNPs that pas CR and MAF criteria
+genotypes <- genotypes[, use]
+snp_summary <- snp_summary[use, ]
+
+# Step 3 - sample-level filtering ----
+
+# Criteria for sample-level filtering :
+# - missing data
+# - sample contamination
+# - correlation (for population-based investigations)
+# - racial, ethnic, or gender ambiguity or discordance
+
+# Call rate : we exclude individuals who are missing genotype data across
+# more and a pre-defined percentage of the typed SNPs (= sample call rate)
+
+# Heterozygosity = presence of each of the two alleles at a given SNP within an 
+# individual. This is expected under HWE to occur with probability 2*p*(1-p) where
+# p is the dominant allele frequency at that SNP (assuming bi-allelic SNP). Excess
+# heterozygosity across typed SNPs within an individual may be an indication of poor sample
+# quality, while deficient heterozygosity can indicate inbreeding or other substructure in
+# that person. Samples with an inbreeding coefficient |F| = (1 - O/E) > 0.10 are removed,
+# where O and E are respectively the observed and expected counts of heterozygous SNPs
+# within an individual.
+
+# 3.1.1 - Create sample statistics (Call rate, heterozygosity)
+sample_summary <- snpStats::row.summary(genotypes)
+
+# 3.1.2 - Add the F stat (inbreeding coefficient) to sample_summary
+maf <- snp_summary$MAF
+call_matrix <- !is.na(genotypes)
+het_exp <- 
