@@ -139,7 +139,8 @@ rm(clinical_file)
 
 # Step 2 - SNP-level filtering (part 1) ----
 
-# Reasons for excluding SNPs :
-# - large amounts of missing data
-# - low variability
-# - genotyping errors
+# Typical SNP filtering workflow :
+# 1) large amount of missing data
+# 2) low variability
+# 3) sample-level filtering (Step 3)
+# 4) possible genotyping errors
