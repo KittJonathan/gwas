@@ -72,6 +72,13 @@ output.dir <- "tutorial/tutorial_output/"
 # Input files
 gwas.fn <- lapply(c(bed = "bed", bim = "bim", fam = "fam", gds = "gds"),
                   function(n) sprintf("%s/chr16_1000g_CEU.%s", data.dir, n))
+clinical.fn <- sprintf("%s/GWAStutorial_clinical.csv", data.dir)
 onethou.fn <- lapply(c(info = "info", ped = "ped"),
                      function(n) sprintf("%s/chr16_1000g_CEU/%s", data.dir, n))
 protein.coding.coords.fname <- sprintf("%s/ProCodgene_coords.csv", output.dir)
+
+# Output files
+gwaa.fname <- sprintf("%s/GWAStutorialout.txt", output.dir)
+gwaa.unadj.fname <- sprintf("%s/GWAStutorialoutUnadj.txt", output.dir)
+impute.out.fname <- sprintf("%s/GWAStutorial_imputationOut.csv", output.dir)
+CETP.fname <- sprintf("%s/CETP_GWASout.csv", output.dir)
