@@ -78,6 +78,7 @@ library(snpStats)
 bed_file <- "tutorial/tutorial_files/GWAStutorial.bed"
 bim_file <- "tutorial/tutorial_files/GWAStutorial.bim"
 fam_file <- "tutorial/tutorial_files/GWAStutorial.fam"
+clinical_file <- "tutorial/tutorial_files/GWAStutorial_clinical.csv"
 
 # Specify parameters to be used in the data processing and analysis
 #data.dir <- "tutorial/tutorial_files/"
@@ -121,6 +122,13 @@ snps <- geno$map %>%
 
 # Clean global environment
 rm(geno, bed_file, bim_file, fam_file)
+
+# 1.3 - read in clinical file
+clinical <- readr::read_csv(clinical_file) %>% 
+  dplyr::mutate(fam_id = as.character(FamID),
+                cad = as.factor(CAD),
+                sex = as.factor(sex)) %>% 
+  dplyr::select(fam_id, cad, sex:ldl)
 
 
 # List bed, bim & fam files from input_dir
