@@ -60,130 +60,52 @@ install.packages("http:::cran.r-project.org/src/contrib/Archive/postgwas/postgwa
 
 library(tidyverse)
 library(snpStats)
-library(SNPRelate)
+#library(SNPRelate)
 
 # Set paths ----
 
-bed_file <- "tutorial/tutorial_files/GWAStutorial.bed"
-bim_file <- "tutorial/tutorial_files/GWAStutorial.bim"
-fam_file <- "tutorial/tutorial_files/GWAStutorial.fam"
-clinical_file <- "tutorial/tutorial_files/GWAStutorial_clinical.csv"
+china_files <- paste("../Downloads/iOmics_data.tar/public/Genomics/110Chinese_2527458snps",
+                        c(".bed", ".bim", ".fam"),
+                        sep = "")
 
-# Specify parameters to be used in the data processing and analysis
-#data.dir <- "tutorial/tutorial_files/"
-#output.dir <- "tutorial/tutorial_output/"
+india_files <- paste("../Downloads/iOmics_data.tar/public/Genomics/105Indian_2527458snps",
+                     c(".bed", ".bim", ".fam"),
+                     sep = "")
 
-# Input files
-#gwas.fn <- lapply(c(bed = "bed", bim = "bim", fam = "fam", gds = "gds"),
- #                 function(n) sprintf("%s/chr16_1000g_CEU.%s", data.dir, n))
-#clinical.fn <- sprintf("%s/GWAStutorial_clinical.csv", data.dir)
-#onethou.fn <- lapply(c(info = "info", ped = "ped"),
- #                    function(n) sprintf("%s/chr16_1000g_CEU/%s", data.dir, n))
-#protein.coding.coords.fname <- sprintf("%s/ProCodgene_coords.csv", output.dir)
+malaysia_files <- paste("../Downloads/iOmics_data.tar/public/Genomics/108Malay_2527458snps",
+                        c(".bed", ".bim", ".fam"),
+                        sep = "")
 
-# Output files
-#gwaa.fname <- sprintf("%s/GWAStutorialout.txt", output.dir)
-#gwaa.unadj.fname <- sprintf("%s/GWAStutorialoutUnadj.txt", output.dir)
-#impute.out.fname <- sprintf("%s/GWAStutorial_imputationOut.csv", output.dir)
-#CETP.fname <- sprintf("%s/CETP_GWASout.csv", output.dir)
+# Read files ----
 
-# Step 1 - reading data into R to create an R object ----
+china_snps <- snpStats::read.plink(bed = china_files[1],
+                                   bim = china_files[2],
+                                   fam = china_files[3])
 
-# 1.1 - read in PLINK files to create list
-geno <- snpStats::read.plink(bed = bed_file,
-                             bim = bim_file,
-                             fam = fam_file,
-                             na.strings = ("-9"))
+india_snps <- snpStats::read.plink(bed = india_files[1],
+                                   bim = india_files[2],
+                                   fam = india_files[3])
 
-# 1.2.1 - obtain the genotypes SnpMatrix object from generated list
-genotypes <- geno$genotypes
-print(genotypes)
+malaysia_snps <- snpStats::read.plink(bed = malaysia_files[1],
+                                      bim = malaysia_files[2],
+                                      fam = malaysia_files[3])
 
-# 1.2.2 - obtain the SNP information table from list
-snps <- geno$map %>% 
-  dplyr::as_tibble() %>% 
-  dplyr::select(chr = chromosome,
-                snp = snp.name,
-                gen_dist = cM,
-                position,
-                allele_1 = allele.1,
-                allele_2 = allele.2)
+# Check the three datasets have the same number of markers ----
 
-# Clean global environment
-rm(geno, bed_file, bim_file, fam_file)
+all.equal(ncol(china_snps$genotypes),
+          ncol(india_snps$genotypes),
+          ncol(malaysia_snps$genotypes))
 
-# 1.3 - read in clinical file
-clinical <- readr::read_csv(clinical_file) %>% 
-  dplyr::mutate(fam_id = as.character(FamID),
-                cad = as.factor(CAD),
-                sex = as.factor(sex)) %>% 
-  dplyr::select(fam_id, cad, sex:ldl) %>% 
-  tibble::column_to_rownames(var = "fam_id")
+# Merge the three SNP datasets ----
 
-# 1.4 - subset genotypes for individuals with clinical data
-genotypes <- genotypes[rownames(clinical), ]
+snps <- malaysia_snps
 
-# Clean global environment
-rm(clinical_file)
+snps$genotypes <- rbind(china_snps$genotypes,
+                        india_snps$genotypes,
+                        malaysia_snps$genotypes)
 
-# Step 2 - SNP-level filtering (part 1) ----
+colnames(snps$map) <- c("chr", "snp", "gen_dist", "position", "allele_1", "allele_2")
 
-# Typical SNP filtering workflow :
-# 1) large amount of missing data
-# 2) low variability
-# 3) sample-level filtering (Step 3)
-# 4) possible genotyping errors
-
-# SNP-level filtering :
-# - call rate = for a given SNP, proportion of inviduals in the study for which the corresponding
-# SNP information is not missing (95% -> less than 5% of missing data)
-# - minor allele frequency (MAF) = a large degree of homogeneity at a given SNP
-# across study participants generally results in inedequate power to infer a statistically
-# significant relationship between the SNP and the trait under study (here, we remove SNPs
-# for which the MAF is less than 1%)
-
-# 2.1 - Create SNP summary statistics (MAF, call rate, ...)
-snp_summary <- snpStats::col.summary(genotypes)
-print(head(snp_summary))
-
-# 2.2 - set thresholds
-cr_threshold <- 0.95
-maf_threshold <- 0.01
-
-# 2.3 - filter on MAF and call rate & remove NAs
-use <- with(snp_summary, (!is.na(MAF) & MAF > maf_threshold) & Call.rate >= cr_threshold)
-use[is.na(use)] <- FALSE
-ncol(genotypes) - sum(use)  # 203,287 SNPs will be removed
-table(use)  # 658,186 SNPs will be kept / 203,287 SNPs will be removed
-
-# 2.4 - subset genotypes and SNP summary data for SNPs that pas CR and MAF criteria
-genotypes <- genotypes[, use]
-snp_summary <- snp_summary[use, ]
-
-# Step 3 - sample-level filtering ----
-
-# Criteria for sample-level filtering :
-# - missing data
-# - sample contamination
-# - correlation (for population-based investigations)
-# - racial, ethnic, or gender ambiguity or discordance
-
-# Call rate : we exclude individuals who are missing genotype data across
-# more and a pre-defined percentage of the typed SNPs (= sample call rate)
-
-# Heterozygosity = presence of each of the two alleles at a given SNP within an 
-# individual. This is expected under HWE to occur with probability 2*p*(1-p) where
-# p is the dominant allele frequency at that SNP (assuming bi-allelic SNP). Excess
-# heterozygosity across typed SNPs within an individual may be an indication of poor sample
-# quality, while deficient heterozygosity can indicate inbreeding or other substructure in
-# that person. Samples with an inbreeding coefficient |F| = (1 - O/E) > 0.10 are removed,
-# where O and E are respectively the observed and expected counts of heterozygous SNPs
-# within an individual.
-
-# 3.1.1 - Create sample statistics (Call rate, heterozygosity)
-sample_summary <- snpStats::row.summary(genotypes)
-
-# 3.1.2 - Add the F stat (inbreeding coefficient) to sample_summary
-maf <- snp_summary$MAF
-#call_matrix <- !is.na(genotypes) memory problem
-het_exp <- genotypes %*% (2*maf*(1-maf))
+snps$fam <- rbind(china_snps$fam,
+                  india_snps$fam,
+                  malaysia_snps$fam)
