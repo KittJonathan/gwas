@@ -75,8 +75,9 @@ library(snpStats)
 
 # Set paths ----
 
-input_files <- list.files(path = "tutorial/tutorial_files/",
-                          full.names = TRUE)
+bed_file <- "tutorial/tutorial_files/GWAStutorial.bed"
+bim_file <- "tutorial/tutorial_files/GWAStutorial.bim"
+fam_file <- "tutorial/tutorial_files/GWAStutorial.fam"
 
 # Specify parameters to be used in the data processing and analysis
 #data.dir <- "tutorial/tutorial_files/"
@@ -97,6 +98,33 @@ input_files <- list.files(path = "tutorial/tutorial_files/",
 #CETP.fname <- sprintf("%s/CETP_GWASout.csv", output.dir)
 
 # Step 1 - reading data into R to create an R object ----
+
+# 1.1 - read in PLINK files to create list
+geno <- snpStats::read.plink(bed = bed_file,
+                             bim = bim_file,
+                             fam = fam_file,
+                             na.strings = ("-9"))
+
+# 1.2.1 - obtain the genotypes SnpMatrix object from generated list
+genotypes <- geno$genotypes
+print(genotypes)
+
+# 1.2.2 - obtain the SNP information table from list
+snps <- geno$map %>% 
+  dplyr::as_tibble() %>% 
+  dplyr::select(chr = chromosome,
+                snp = snp.name,
+                gen_dist = cM,
+                position,
+                allele_1 = allele.1,
+                allele_2 = allele.2)
+
+# Clean global environment
+rm(geno, bed_file, bim_file, fam_file)
+
+
+# List bed, bim & fam files from input_dir
+bed_file <- input_files[grepl("^*.bed$")]
 
 library(snpStats)
 
