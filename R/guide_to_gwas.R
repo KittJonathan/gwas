@@ -128,18 +128,18 @@ clinical <- readr::read_csv(clinical_file) %>%
   dplyr::mutate(fam_id = as.character(FamID),
                 cad = as.factor(CAD),
                 sex = as.factor(sex)) %>% 
-  dplyr::select(fam_id, cad, sex:ldl)
+  dplyr::select(fam_id, cad, sex:ldl) %>% 
+  tibble::column_to_rownames(var = "fam_id")
 
+# 1.4 - subset genotypes for individuals with clinical data
+genotypes <- genotypes[rownames(clinical), ]
 
-# List bed, bim & fam files from input_dir
-bed_file <- input_files[grepl("^*.bed$")]
+# Clean global environment
+rm(clinical_file)
 
-library(snpStats)
+# Step 2 - SNP-level filtering (part 1) ----
 
-geno <- snpStats::read.plink(bed = "tutorial/tutorial_files/GWAStutorial.bed",
-                             bim = "tutorial/tutorial_files/GWAStutorial.bim",
-                             fam = "tutorial/tutorial_files/GWAStutorial.fam",
-                             na.strings = ("-9"))
-
-genotype <- geno$genotypes
-print(genotype)
+# Reasons for excluding SNPs :
+# - large amounts of missing data
+# - low variability
+# - genotyping errors
