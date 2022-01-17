@@ -1,6 +1,8 @@
-# Genome-wide association studies in R
+# A guide to genome-wide association analysis and post-analytic interrogation
 
-# Last updated 2022-01-14
+# https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6605
+
+# Last updated 2022-01-17
 
 # Links ----
 
@@ -13,9 +15,8 @@
 # http://ww7.stat-gen.org/
 # https://www.mtholyoke.edu/courses/afoulkes/Data/GWAStutorial/
 
-# A guide to genome-wide association analysis and post-analytic interrogation ----
+# Workflow ----
 
-# https://onlinelibrary.wiley.com/doi/full/10.1002/sim.6605
 
 # Ten steps:
 # 1) reading data into R to create an R object
@@ -36,6 +37,8 @@
 # .bed file: binary version of the genotype data
 # .fam file: participant identification information (same as .ped, without the genotype)
 # clinical data file: .txt or .csv, clinical data on each study subject (covariates and phenotypes)
+
+# Install packages ----
 
 # Packages :
 # snpStats: read in various formats of genotype data, carry out QC, imputation & association analysis
@@ -65,25 +68,35 @@ install.packages("https://github.com/merns/postgwas/releases/download/1.11-2/pos
 library(devtools)
 install.packages("http:::cran.r-project.org/src/contrib/Archive/postgwas/postgwas_1.11.tar.gz")
 
+# Load packages ----
+
+library(tidyverse)
+library(snpStats)
+
+# Set paths ----
+
+input_files <- list.files(path = "tutorial/tutorial_files/",
+                          full.names = TRUE)
+
 # Specify parameters to be used in the data processing and analysis
-data.dir <- "tutorial/tutorial_files/"
-output.dir <- "tutorial/tutorial_output/"
+#data.dir <- "tutorial/tutorial_files/"
+#output.dir <- "tutorial/tutorial_output/"
 
 # Input files
-gwas.fn <- lapply(c(bed = "bed", bim = "bim", fam = "fam", gds = "gds"),
-                  function(n) sprintf("%s/chr16_1000g_CEU.%s", data.dir, n))
-clinical.fn <- sprintf("%s/GWAStutorial_clinical.csv", data.dir)
-onethou.fn <- lapply(c(info = "info", ped = "ped"),
-                     function(n) sprintf("%s/chr16_1000g_CEU/%s", data.dir, n))
-protein.coding.coords.fname <- sprintf("%s/ProCodgene_coords.csv", output.dir)
+#gwas.fn <- lapply(c(bed = "bed", bim = "bim", fam = "fam", gds = "gds"),
+ #                 function(n) sprintf("%s/chr16_1000g_CEU.%s", data.dir, n))
+#clinical.fn <- sprintf("%s/GWAStutorial_clinical.csv", data.dir)
+#onethou.fn <- lapply(c(info = "info", ped = "ped"),
+ #                    function(n) sprintf("%s/chr16_1000g_CEU/%s", data.dir, n))
+#protein.coding.coords.fname <- sprintf("%s/ProCodgene_coords.csv", output.dir)
 
 # Output files
-gwaa.fname <- sprintf("%s/GWAStutorialout.txt", output.dir)
-gwaa.unadj.fname <- sprintf("%s/GWAStutorialoutUnadj.txt", output.dir)
-impute.out.fname <- sprintf("%s/GWAStutorial_imputationOut.csv", output.dir)
-CETP.fname <- sprintf("%s/CETP_GWASout.csv", output.dir)
+#gwaa.fname <- sprintf("%s/GWAStutorialout.txt", output.dir)
+#gwaa.unadj.fname <- sprintf("%s/GWAStutorialoutUnadj.txt", output.dir)
+#impute.out.fname <- sprintf("%s/GWAStutorial_imputationOut.csv", output.dir)
+#CETP.fname <- sprintf("%s/CETP_GWASout.csv", output.dir)
 
-# Step 1 - Read and format data
+# Step 1 - reading data into R to create an R object ----
 
 library(snpStats)
 
