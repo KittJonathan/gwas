@@ -64,17 +64,15 @@ library(snpStats)
 
 # Set paths ----
 
-china_files <- paste("../Downloads/iOmics_data.tar/public/Genomics/110Chinese_2527458snps",
-                        c(".bed", ".bim", ".fam"),
-                        sep = "")
+india_files <- paste("data/public/Genomics/105Indian_2527458snps",
+                     c(".bed", ".bim", ".fam"), sep = "")
 
-india_files <- paste("../Downloads/iOmics_data.tar/public/Genomics/105Indian_2527458snps",
-                     c(".bed", ".bim", ".fam"),
-                     sep = "")
+malaysia_files <- paste("data/public/Genomics/108Malay_2527458snps",
+                        c(".bed", ".bim", ".fam"), sep = "")
 
-malaysia_files <- paste("../Downloads/iOmics_data.tar/public/Genomics/108Malay_2527458snps",
-                        c(".bed", ".bim", ".fam"),
-                        sep = "")
+china_files <- paste("data/public/Genomics/110Chinese_2527458snps",
+                        c(".bed", ".bim", ".fam"), sep = "")
+
 
 # Read files ----
 
