@@ -102,23 +102,20 @@ malaysia_snps <- snpStats::read.plink(bed = malaysia_files[1],
                                       fam = malaysia_files[3])
 
 rm(china_files, india_files, malaysia_files)
+all.equal(snps_china$genotypes)
 
-# Check the three datasets have the same number of markers ----
-
-all.equal(ncol(china_snps$genotypes),
-          ncol(india_snps$genotypes),
-          ncol(malaysia_snps$genotypes))
+load("data/conversionTable.RData")
 
 # Merge the three SNP datasets ----
 
-snps <- malaysia_snps
+snps <- snps_malaysia
+snps$genotypes <- rbind(snps_malaysia$genotypes, snps_india$genotypes, snps_china$genotypes)
+colnames(snps$map) <- c("chr", "SNP", "gen.dist", "position", "A1", "A2")
+snps$fam <- rbind(snps_malaysia$fam, snps_india$fam, snps_china$fam)
 
-snps$genotypes <- rbind(china_snps$genotypes,
-                        india_snps$genotypes,
-                        malaysia_snps$genotypes)
+# Rename SNPs present in the conversion table into rs IDs ----
 
-colnames(snps$map) <- c("chr", "snp", "gen_dist", "position", "allele_1", "allele_2")
-
-snps$fam <- rbind(china_snps$fam,
-                  india_snps$fam,
-                  malaysia_snps$fam)
+mapped_snps <- intersect(snps$map$SNP, names(conversionTable))
+new_ids <- conversionTable[match(snps$map$SNP[snps$map$SNP %in% mapped_snps],
+                                 names(conversionTable))]
+snps$map$SNP[rownames(snps$map) %in% mapped_snps] <- new_ids
