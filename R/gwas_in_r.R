@@ -125,3 +125,9 @@ snps$map$SNP[rownames(snps$map) %in% mapped_snps] <- new_ids
 malaysia_lipids <- read.delim("data/public/Lipidomic/117Malay_282lipids.txt", row.names = 1)
 india_lipids <- read.delim("data/public/Lipidomic/120Indian_282lipids.txt", row.names = 1)
 china_lipids <- read.delim("data/public/Lipidomic/122Chinese_282lipids.txt", row.names = 1)
+
+all(Reduce(intersect, list(colnames(malaysia_lipids),
+                           colnames(india_lipids),
+                           colnames(china_lipids))) == colnames(malaysia_lipids))
+
+lipids <- rbind(malaysia_lipids, india_lipids, china_lipids)
