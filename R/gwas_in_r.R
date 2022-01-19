@@ -119,3 +119,9 @@ mapped_snps <- intersect(snps$map$SNP, names(conversionTable))
 new_ids <- conversionTable[match(snps$map$SNP[snps$map$SNP %in% mapped_snps],
                                  names(conversionTable))]
 snps$map$SNP[rownames(snps$map) %in% mapped_snps] <- new_ids
+
+# Import lipid datasets & match SNP-Lipidomics samples ----
+
+malaysia_lipids <- read.delim("data/public/Lipidomic/117Malay_282lipids.txt", row.names = 1)
+india_lipids <- read.delim("data/public/Lipidomic/120Indian_282lipids.txt", row.names = 1)
+china_lipids <- read.delim("data/public/Lipidomic/122Chinese_282lipids.txt", row.names = 1)
