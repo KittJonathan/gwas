@@ -73,6 +73,19 @@ malaysia_files <- paste("data/public/Genomics/108Malay_2527458snps",
 china_files <- paste("data/public/Genomics/110Chinese_2527458snps",
                         c(".bed", ".bim", ".fam"), sep = "")
 
+# Read files ----
+
+snps_india <- snpStats::read.plink(bed = india_files[1],
+                                   bim = india_files[2],
+                                   fam = india_files[3])
+
+snps_malaysia <- snpStats::read.plink(bed = malaysia_files[1],
+                                      bim = malaysia_files[2],
+                                      fam = malaysia_files[3])
+
+snps_china <- snpStats::read.plink(bed = china_files[1],
+                                   bim = china_files[2],
+                                   fam = china_files[3])
 
 # Read files ----
 
@@ -87,6 +100,8 @@ india_snps <- snpStats::read.plink(bed = india_files[1],
 malaysia_snps <- snpStats::read.plink(bed = malaysia_files[1],
                                       bim = malaysia_files[2],
                                       fam = malaysia_files[3])
+
+rm(china_files, india_files, malaysia_files)
 
 # Check the three datasets have the same number of markers ----
 
