@@ -102,7 +102,7 @@ malaysia_snps <- snpStats::read.plink(bed = malaysia_files[1],
                                       fam = malaysia_files[3])
 
 rm(china_files, india_files, malaysia_files)
-all.equal(snps_china$genotypes)
+all.equal(ncol(snps_china$genotypes), ncol(snps_india$genotypes), ncol(snps_malaysia$genotypes))
 
 load("data/conversionTable.RData")
 
