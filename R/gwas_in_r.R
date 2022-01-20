@@ -242,3 +242,24 @@ genData$LIP <- genData$LIP[!(rownames(genData$LIP) %in% related.samples), ]
 
 # Principal Component Analysis ----
 
+# PCA
+set.seed(100)
+pca <- SNPRelate::snpgdsPCA(genofile, sample.id = geno.sample.ids,
+                            snp.id = snpset.ibd, num.thread = 1)
+pcatab <- data.frame(sample.id = pca$sample.id,
+                     PC1 = pca$eigenvect[, 1],
+                     PC2 = pca$eigenvect[, 2],
+                     stringsAsFactors = FALSE)
+
+# Subset and/or reorder origin accordingly
+origin <- origin[match(pca$sample.id, origin$sample.id), ]
+
+pcaCol <- rep(rgb(0, 0, 0, 0.3), length(pca$sample.id))
+pcaCol[origin$country == "I"] <- rgb(1, 0, 0, 0.3)
+pcaCol[origin$country == "M"] <- rgb(0, 0.7, 0, 0.3)
+
+png("output/PCApopulation.png", width = 500, height = 500)
+plot(pcatab$PC1, pcatab$PC2, xlab = "PC1", ylab = "PC2", col = pcaCol, pch = 16)
+abline(h = 0, v = 0, lty = 2, col = "grey")
+legend("top", legend = c("Chinese", "Indian", "Malay"), col = 1:3, pch = 16, bty = "n")
+dev.off()
