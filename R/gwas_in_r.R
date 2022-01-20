@@ -263,3 +263,33 @@ plot(pcatab$PC1, pcatab$PC2, xlab = "PC1", ylab = "PC2", col = pcaCol, pch = 16)
 abline(h = 0, v = 0, lty = 2, col = "grey")
 legend("top", legend = c("Chinese", "Indian", "Malay"), col = 1:3, pch = 16, bty = "n")
 dev.off()
+
+# Genome-Wide Association ----
+
+source("R/GWASfunction.R")
+
+target <- "Cholesterol"
+
+phenodata <- data.frame("id" = rownames(genData$LIP),
+                        "phenotype" = scale(genData$LIP[, target]), stringsAsFactors = FALSE)
+
+start <- Sys.time()
+GWAA(genodata = genData$SNP,
+     phenodata = phenodata,
+     filename = paste(target, ".txt", sep = ""))
+Sys.time() - start  # 51 mins
+
+# Manhattan plot
+GWASout <- read.table("Cholesterol.txt", header = TRUE,
+                      colClasses = c("character", rep("numeric", 4)))
+GWASout$type <- rep("typed", nrow(GWASout))
+GWASout$Neg_logP <- -log10(GWASout$p.value)
+
+GWASout <- merge(GWASout, genData$MAP[, c("SNP", "chr", "position")])
+GWASout <- GWASout[order(GWASout$Neg_logP, decreasing = TRUE), ]
+
+readr::write_tsv(GWASout, "output/gwas_out.txt")
+
+png(paste(target, ".png", sep = ""), height = 500, width = 500)
+GWAS_Manhattan(GWASout)
+dev.off
