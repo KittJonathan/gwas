@@ -202,3 +202,43 @@ SNPRelate::snpgdsBED2GDS(bed.fn = "output/convertGDS.bed",
                          fam.fn = "output/convertGDS.fam",
                          out.gdsfn = "output/myGDS",
                          cvt.chr = "char")
+
+genofile <- SNPRelate::snpgdsOpen("output/myGDS", readonly = FALSE)
+gds.ids <- gdsfmt::read.gdsn(index.gdsn(genofile, "sample.id"))
+gds.ids <- sub("-1", "", gds.ids)
+gdsfmt::add.gdsn(genofile, "sample.id", gds.ids, replace = TRUE)
+geno.sample.ids <- rownames(genData$SNP)
+
+# First filter for LD
+snpSUB <- SNPRelate::snpgdsLDpruning(genofile, ld.threshold = ld,
+                                     sample.id = geno.sample.ids,
+                                     snp.id = colnames(genData$SNP))
+snpset.ibd <- unlist(snpSUB, use.names = FALSE)
+
+# And now filter for MoM
+ibd <- SNPRelate::snpgdsIBDMoM(genofile, kinship = TRUE,
+                               sample.id = geno.sample.ids,
+                               snp.id = snpset.ibd,
+                               num.thread = 1)
+ibdcoef <- SNPRelate::snpgdsIBDSelection(ibd)
+ibdcoef <- ibdcoef[ibdcoef$kinship >= kin, ]
+
+# Filter samples out
+related.samples <- NULL
+while (nrow(ibdcoef) > 0) {
+  # count the number of occurrences of each and take the top one
+  sample.counts <- sort(table(c(ibdcoef$ID1, ibdcoef$ID2)), decreasing = T)
+  rm.sample <- names(sample.counts)[1]
+  cat("Removing sample", rm.sample, "too closely related to",
+      sample.counts[1], "other samples.\n")
+  
+  # remove from ibdcoef and add to list
+  ibdcoef <- ibdcoef[ibdcoef$ID1 != rm.sample & ibdcoef$ID2 != rm.sample,]
+  related.samples <- c(as.character(rm.sample), related.samples)
+}
+
+genData$SNP <- genData$SNP[!(rownames(genData$SNP) %in% related.samples), ]
+genData$LIP <- genData$LIP[!(rownames(genData$LIP) %in% related.samples), ]
+
+# Principal Component Analysis ----
+
