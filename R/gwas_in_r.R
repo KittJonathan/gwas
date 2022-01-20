@@ -60,7 +60,7 @@ install.packages("http:::cran.r-project.org/src/contrib/Archive/postgwas/postgwa
 
 library(tidyverse)
 library(snpStats)
-#library(SNPRelate)
+library(SNPRelate)
 
 # Set paths ----
 
@@ -162,3 +162,19 @@ snpStats::write.plink("output/convertGDS", snps = snps$genotypes)
 
 # Clear memory
 rm(list = ls())
+
+# Pre-processing ----
+
+# Load files
+load("output/PhenoGenoMap.RData")
+
+# Use SNP call rate of 100% & MAF of 0.1 (very stringent)
+maf <- 0.1
+callRate <- 1
+
+SNPstats <- snpStats::col.summary(genData$SNP)
+
+maf_call <- with(SNPstats, MAF > maf & Call.rate == callRate)
+genData$SNP <- genData$SNP[, maf_call]
+genData$MAP <- genData$MAP[maf_call, ]
+SNPstats <- SNPstats[maf_call, ]
