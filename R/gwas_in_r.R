@@ -178,3 +178,27 @@ maf_call <- with(SNPstats, MAF > maf & Call.rate == callRate)
 genData$SNP <- genData$SNP[, maf_call]
 genData$MAP <- genData$MAP[maf_call, ]
 SNPstats <- SNPstats[maf_call, ]
+
+# Sample call rate & heterozygosity
+callMat <- !is.na(genData$SNP)
+Sampstats <- snpStats::row.summary(genData$SNP)
+
+hetExp <- callMat %*% (2 * SNPstats$MAF * (1 - SNPstats$MAF))
+hetObs <- with(Sampstats, Heterozygosity * (ncol(genData$SNP)) * Call.rate)
+Sampstats$hetF <- 1 - (hetObs / hetExp)
+
+# Use sample call rate of 100%, het threshold of 0.1 (veryf stringent)
+het <- 0.1
+het_call <- with(Sampstats, abs(hetF) < het & Call.rate == 1)
+genData$SNP <- genData$SNP[het_call, ]
+genData$LIP <- genData$LIP[het_call, ]
+
+# LD and kinship coeff
+ld <- 0.2
+kin <- 0.1
+
+SNPRelate::snpgdsBED2GDS(bed.fn = "output/convertGDS.bed",
+                         bim.fn = "output/convertGDS.bim",
+                         fam.fn = "output/convertGDS.fam",
+                         out.gdsfn = "output/myGDS",
+                         cvt.chr = "char")
