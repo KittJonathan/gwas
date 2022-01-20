@@ -75,6 +75,8 @@ china_files <- paste("data/public/Genomics/110Chinese_2527458snps",
 
 # Read files ----
 
+load("data/public/conversionTable.RData")
+
 snps_india <- snpStats::read.plink(bed = india_files[1],
                                    bim = india_files[2],
                                    fam = india_files[3])
@@ -131,3 +133,32 @@ all(Reduce(intersect, list(colnames(malaysia_lipids),
                            colnames(china_lipids))) == colnames(malaysia_lipids))
 
 lipids <- rbind(malaysia_lipids, india_lipids, china_lipids)
+
+# Country ----
+
+country <- sapply(list(snps_malaysia, snps_india, snps_china), function(k){
+  nrow(k$genotypes)
+})
+
+origin <- data.frame(sample.id = rownames(snps$genotypes),
+                     country = factor(rep(c("M", "I", "C"), country)))
+
+matchingSamples <- intersect(rownames(lipids), rownames(snps$genotypes))
+
+snps$genotypes <- snps$genotypes[matchingSamples, ]
+lipids <- lipids[matchingSamples, ]
+origin <- origin[match(matchingSamples, origin$sample.id), ]
+
+# Combine SNPs and lipidomics ----
+
+genData <- list(SNP = snps$genotypes,
+                MAP = snps$map,
+                LIP = lipids)
+
+# Write processed omics and GDS ----
+
+save(genData, origin, file = "output/PhenoGenoMap.RData")
+snpStats::write.plink("output/convertGDS", snps = snps$genotypes)
+
+# Clear memory
+rm(list = ls())
