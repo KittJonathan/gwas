@@ -102,5 +102,9 @@ summary(mixed.lmer2)
 # Allow for random slopes + ranndom intercept
 mixed.ranslope <- lmer(testScore ~ bodyLength2 + (1 + bodyLength2|mountainRange/site), data = dragons) 
 
+
+mixed.lmer2 <- lmer(testScore ~ bodyLength2 + (1|mountainRange) + (1|sample),
+                    data = dragons)
+
 summary(mixed.ranslope)
 
