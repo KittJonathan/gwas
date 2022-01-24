@@ -10,6 +10,8 @@
 
 # Introduction to linear mixed models ----
 
+library(tidyverse)
+
 # https://ourcodingclub.github.io/tutorials/mixed-models/
 
 # Explore the data (3 sites in 8 different mountain ranges)
@@ -22,5 +24,27 @@ dragons$bodyLength2 <- scale(dragons$bodyLength,  # center (mean = 0) and scale 
                              center = TRUE,
                              scale = TRUE)
 
-# Fit all data in one analysis
+# Fit all data in one analysis (ignore the sites and mountain ranges for now)
 
+basic.lm <- lm(testScore ~ bodyLength2,  # response ~ predictor
+               data = dragons)
+
+summary(basic.lm)
+
+(prelim_plot <- ggplot(dragons, aes(x = bodyLength, y = testScore)) +
+    geom_point() +
+    geom_smooth(method = "lm"))
+
+plot(basic.lm, which = 1)  # plot the residuals
+
+plot(basic.lm, which = 2)  # qqplot
+
+boxplot(testScore ~ mountainRange, data = dragons)
+
+(colour_plot <- ggplot(dragons, aes(x = bodyLength, y = testScore,
+                                    colour = mountainRange)) +
+    geom_point(size = 2) +
+    theme_classic() +
+    theme(legend.position = "none"))
+
+# Run multiple analyses
