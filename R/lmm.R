@@ -29,6 +29,9 @@ my.df
 xmdl <- lm(pitch ~ sex, my.df)
 summary(xmdl)
 
+mean(my.df[my.df$sex == "female", ]$pitch)
+mean(my.df[my.df$sex == "male", ]$pitch)
+
 # Introduction to linear mixed models ----
 
 # https://ourcodingclub.github.io/tutorials/mixed-models/
