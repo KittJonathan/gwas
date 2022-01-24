@@ -19,6 +19,11 @@ library(tidyverse)
 
 # https://bodo-winter.net/tutorials.html
 
+# Create the dataset
+pitch <- c(233, 204, 242, 130, 112, 142)
+sex <- c(rep("female", 3), rep("male", 3))
+my.df <- data.frame(sex, pitch)
+my.df
 
 # Introduction to linear mixed models ----
 
