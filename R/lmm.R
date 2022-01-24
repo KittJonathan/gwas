@@ -8,9 +8,12 @@
 # https://towardsdatascience.com/how-linear-mixed-model-works-350950a82911
 # https://poissonisfish.com/2017/12/11/linear-mixed-effect-models-in-r/
 
-# Introduction to linear mixed models ----
+# Load packages ----
 
+library(lme4)
 library(tidyverse)
+
+# Introduction to linear mixed models ----
 
 # https://ourcodingclub.github.io/tutorials/mixed-models/
 
@@ -60,3 +63,10 @@ boxplot(testScore ~ mountainRange, data = dragons)
 mountain.lm <- lm(testScore ~ bodyLength2 + mountainRange,  # add mountain range as a fixed effect
                   data = dragons)
 summary(mountain.lm)
+
+# Mixed effects models
+
+mixed.lmer <- lmer(testScore ~ bodyLength2 + (1|mountainRange),  # fit the random effect
+                   data = dragons)
+summary(mixed.lmer)
+339.7/(339.7+223.8)  # divide mountainRange variance by total variance -> ~60%
