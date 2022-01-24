@@ -15,6 +15,11 @@
 library(lme4)
 library(tidyverse)
 
+# Linear models and linear mixed effects models in R: Tutorial 1 ----
+
+# https://bodo-winter.net/tutorials.html
+
+
 # Introduction to linear mixed models ----
 
 # https://ourcodingclub.github.io/tutorials/mixed-models/
@@ -113,3 +118,4 @@ summary(mixed.ranslope)
 # Linear mixed-effect models in R ----
 
 # https://poissonisfish.com/2017/12/11/linear-mixed-effect-models-in-r/
+
