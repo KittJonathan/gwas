@@ -70,3 +70,11 @@ mixed.lmer <- lmer(testScore ~ bodyLength2 + (1|mountainRange),  # fit the rando
                    data = dragons)
 summary(mixed.lmer)
 339.7/(339.7+223.8)  # divide mountainRange variance by total variance -> ~60%
+
+plot(mixed.lmer)
+qqnorm(resid(mixed.lmer))
+qqline(resid(mixed.lmer))
+
+dragons <- within(dragons, sample <- factor(mountainRange:site))
+
+# Our second mixed model
