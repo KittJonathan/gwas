@@ -86,3 +86,14 @@ summary(mixed.WRONG)
 mixed.lmer2 <- lmer(testScore ~ bodyLength2 + (1|mountainRange) + (1|sample),
                     data = dragons)
 summary(mixed.lmer2)
+
+(mm_plot <- ggplot(dragons, aes(x = bodyLength, y = testScore,
+                                colour = site)) +
+    facet_wrap(~mountainRange, nrow = 2) +  # a panel for each mountain range
+    geom_point(alpha = 0.5) +
+    theme_classic() +
+    geom_line(data = cbind(dragons, pred = predict(mixed.lmer2)),
+              aes(y = pred), size = 1) +  # adding predicted line from mixed models
+    theme(legend.position = "none",
+          panel.spacing = unit(2, "lines"))
+)
