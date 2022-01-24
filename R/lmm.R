@@ -108,3 +108,7 @@ mixed.lmer2 <- lmer(testScore ~ bodyLength2 + (1|mountainRange) + (1|sample),
 
 summary(mixed.ranslope)
 
+
+# Linear mixed-effect models in R ----
+
+# https://poissonisfish.com/2017/12/11/linear-mixed-effect-models-in-r/
