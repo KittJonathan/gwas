@@ -98,3 +98,9 @@ summary(mixed.lmer2)
     theme(legend.position = "none",
           panel.spacing = unit(2, "lines"))
 )
+
+# Allow for random slopes + ranndom intercept
+mixed.ranslope <- lmer(testScore ~ bodyLength2 + (1 + bodyLength2|mountainRange/site), data = dragons) 
+
+summary(mixed.ranslope)
+
