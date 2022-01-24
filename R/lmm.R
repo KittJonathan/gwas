@@ -11,3 +11,16 @@
 # Introduction to linear mixed models ----
 
 # https://ourcodingclub.github.io/tutorials/mixed-models/
+
+# Explore the data (3 sites in 8 different mountain ranges)
+
+load("data/CC-Linear-mixed-models-master/dragons.RData")
+head(dragons)
+hist(dragons$testScore)  # seems close to a normal distribution
+
+dragons$bodyLength2 <- scale(dragons$bodyLength,  # center (mean = 0) and scale (sd = 1) 
+                             center = TRUE,
+                             scale = TRUE)
+
+# Fit all data in one analysis
+
