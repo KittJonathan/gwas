@@ -78,3 +78,11 @@ qqline(resid(mixed.lmer))
 dragons <- within(dragons, sample <- factor(mountainRange:site))
 
 # Our second mixed model
+
+mixed.WRONG <- lmer(testScore ~ bodyLength2 + (1|mountainRange) + (1|site),
+                    data = dragons)
+summary(mixed.WRONG)
+
+mixed.lmer2 <- lmer(testScore ~ bodyLength2 + (1|mountainRange) + (1|sample),
+                    data = dragons)
+summary(mixed.lmer2)
