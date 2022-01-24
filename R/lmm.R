@@ -25,6 +25,10 @@ sex <- c(rep("female", 3), rep("male", 3))
 my.df <- data.frame(sex, pitch)
 my.df
 
+# Linear model
+xmdl <- lm(pitch ~ sex, my.df)
+summary(xmdl)
+
 # Introduction to linear mixed models ----
 
 # https://ourcodingclub.github.io/tutorials/mixed-models/
