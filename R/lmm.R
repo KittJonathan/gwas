@@ -54,3 +54,9 @@ boxplot(testScore ~ mountainRange, data = dragons)
     facet_wrap(~ mountainRange) +  # create a facet for each mountain range
     xlab("length") +
     ylab("test score"))
+
+# Modify the current model
+
+mountain.lm <- lm(testScore ~ bodyLength2 + mountainRange,  # add mountain range as a fixed effect
+                  data = dragons)
+summary(mountain.lm)
