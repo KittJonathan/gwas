@@ -48,3 +48,9 @@ boxplot(testScore ~ mountainRange, data = dragons)
     theme(legend.position = "none"))
 
 # Run multiple analyses
+
+(split_plot <- ggplot(aes(bodyLength, testScore), data = dragons) +
+    geom_point() +
+    facet_wrap(~ mountainRange) +  # create a facet for each mountain range
+    xlab("length") +
+    ylab("test score"))
