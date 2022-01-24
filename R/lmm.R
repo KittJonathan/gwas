@@ -8,6 +8,7 @@
 # https://towardsdatascience.com/how-linear-mixed-model-works-350950a82911
 # https://poissonisfish.com/2017/12/11/linear-mixed-effect-models-in-r/
 # https://mfviz.com/hierarchical-models/
+# https://onlinelibrary.wiley.com/doi/full/10.1046/j.1439-037X.2003.00049.x
 
 # Load packages ----
 
