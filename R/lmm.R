@@ -31,3 +31,10 @@ summary(xmdl)
 
 mean(my.df[my.df$sex == "female", ]$pitch)
 mean(my.df[my.df$sex == "male", ]$pitch)
+
+# Other dataset
+age <- c(14, 23, 35, 48, 52, 67)
+pitch <- c(252, 244, 240, 233, 212, 204)
+my.df <- data.frame(age, pitch)
+xmdl <- lm(pitch ~ age, my.df)
+summary(xmdl)
