@@ -38,3 +38,11 @@ pitch <- c(252, 244, 240, 233, 212, 204)
 my.df <- data.frame(age, pitch)
 xmdl <- lm(pitch ~ age, my.df)
 summary(xmdl)
+
+# Substract the mean age from each age value
+my.df$age.c <- my.df$age - mean(my.df$age)
+xmdl <- lm(pitch ~ age.c, my.df)
+summary(xmdl)
+
+# Construct the residual plot
+plot(fitted(xmdl), residuals(xmdl))
