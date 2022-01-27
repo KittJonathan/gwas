@@ -46,3 +46,13 @@ summary(xmdl)
 
 # Construct the residual plot
 plot(fitted(xmdl), residuals(xmdl))
+
+# Simulating equal variances
+plot(rnorm(100), rnorm(100))
+
+# Normality of residuals
+hist(residuals(xmdl))
+qqnorm(residuals(xmdl))
+
+# Absence of influential data points
+dfbeta(xmdl)
