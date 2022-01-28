@@ -1,6 +1,6 @@
 # Linear mixed models
 
-# Last updated 2022-01-27
+# Last updated 2022-01-28
 
 # Links ----
 
@@ -59,3 +59,14 @@ dfbeta(xmdl)
 
 # A very basic tutorial for performing linear mixed effects analyses: Tutorial 2 ----
 
+# Load data
+politeness <- read.csv("http://www.bodowinter.com/tutorial/politeness_data.csv")
+
+# Look at the data
+head(politeness)
+tail(politeness)
+summary(politeness)
+str(politeness)
+colnames(politeness)
+which(is.na(politeness$frequency))
+which(!complete.cases(politeness))
