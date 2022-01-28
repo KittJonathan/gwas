@@ -76,3 +76,7 @@ boxplot(frequency ~ attitude*gender,
         col = c("white", "lightgray"), data = politeness)
 
 # Construct the model
+politeness.model <- lmer(frequency ~ attitude + (1|subject) + (1|scenario),
+                         data = politeness)
+
+summary(politeness.model)
