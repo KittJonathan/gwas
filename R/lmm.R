@@ -80,3 +80,8 @@ politeness.model <- lmer(frequency ~ attitude + (1|subject) + (1|scenario),
                          data = politeness)
 
 summary(politeness.model)
+
+# Add gender as an additional fixed effect
+politeness.model <- lmer(frequency ~ attitude + gender + (1|subject) + (1|scenario),
+                         data = politeness)
+summary(politeness.model)
