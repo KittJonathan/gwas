@@ -56,3 +56,6 @@ qqnorm(residuals(xmdl))
 
 # Absence of influential data points
 dfbeta(xmdl)
+
+# A very basic tutorial for performing linear mixed effects analyses: Tutorial 2 ----
+
