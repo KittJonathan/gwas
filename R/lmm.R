@@ -70,3 +70,9 @@ str(politeness)
 colnames(politeness)
 which(is.na(politeness$frequency))
 which(!complete.cases(politeness))
+
+# Relationship between politeness & pitch
+boxplot(frequency ~ attitude*gender,
+        col = c("white", "lightgray"), data = politeness)
+
+# Construct the model
