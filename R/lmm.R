@@ -96,3 +96,5 @@ politeness.model <- lmer(frequency ~ attitude + gender + (1|subject) + (1|scenar
 
 # Perform the likelihood ratio test
 anova(politeness.null, politeness.model)
+
+# Random slopes versus random intercepts
