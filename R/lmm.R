@@ -89,3 +89,10 @@ summary(politeness.model)
 # Construct the null model
 politeness.null <- lmer(frequency ~ gender + (1|subject) + (1|scenario),
                         data = politeness, REML = FALSE)
+
+# Re-do the full model, with REML = FALSE
+politeness.model <- lmer(frequency ~ attitude + gender + (1|subject) + (1|scenario),
+                         data = politeness, REML = FALSE)
+
+# Perform the likelihood ratio test
+anova(politeness.null, politeness.model)
