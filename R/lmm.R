@@ -98,3 +98,18 @@ politeness.model <- lmer(frequency ~ attitude + gender + (1|subject) + (1|scenar
 anova(politeness.null, politeness.model)
 
 # Random slopes versus random intercepts
+coef(politeness.model)
+
+# Create a model which allows random slopes
+politeness.model <- lmer(frequency ~ attitude + gender + 
+                           (1+attitude|subject) + (1+attitude|scenario),
+                         data = politeness, REML = FALSE)
+coef(politeness.model)
+
+# Create a random slope null model
+politeness.null <- lmer(frequency ~ gender + 
+                          (1+attitude|subject) + (1+attitude|scenario),
+                        data = politeness, REML = FALSE)
+
+# Likelihood ratio test
+anova(politeness.null, politeness.model)
