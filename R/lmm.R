@@ -86,4 +86,6 @@ politeness.model <- lmer(frequency ~ attitude + gender + (1|subject) + (1|scenar
                          data = politeness)
 summary(politeness.model)
 
-# Statistical significance
+# Construct the null model
+politeness.null <- lmer(frequency ~ gender + (1|subject) + (1|scenario),
+                        data = politeness, REML = FALSE)
