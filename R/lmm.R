@@ -85,3 +85,5 @@ summary(politeness.model)
 politeness.model <- lmer(frequency ~ attitude + gender + (1|subject) + (1|scenario),
                          data = politeness)
 summary(politeness.model)
+
+# Statistical significance
