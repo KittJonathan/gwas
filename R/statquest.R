@@ -11,3 +11,7 @@ mouse.data <- data.frame(
   size = c(1.4, 2.6, 1.0, 3.7, 5.5, 3.2, 3.0, 4.9, 6.3))
 
 mouse.data
+
+plot(mouse.data$weight, mouse.data$size)
+
+mouse.regression <- lm(size ~ weight, data = mouse.data)
