@@ -24,3 +24,11 @@
 # 1.1.3 Population- versus family-based investigations
 
 # Individuals within the same family are likely to be more similar than are individuals from different families
+# Allelic phase (= alignment of nucleotides on a single homolog) is typically unobservable in population-based association studies
+
+# 1.1.4 Association versus population genetics
+
+# Population genetics refers generally to the study of changes in the genetic composition of a population that occur
+# over time and under evolutionary pressures (eg study of natural selection and genetic drift)
+
+# 1.3 Data components and terminology
