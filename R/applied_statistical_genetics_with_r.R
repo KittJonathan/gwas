@@ -32,3 +32,8 @@
 # over time and under evolutionary pressures (eg study of natural selection and genetic drift)
 
 # 1.3 Data components and terminology
+
+# Data arising from population-based genetic association studies are generally comprised of three components:
+# (1) the genotype of the organism under investigation
+# (2) a single trait or multiple traits (or phenotypes) that are associated with disease progression or disease status
+# (3) patient-specific covariates (treatment history, additional clinical and demographic information)
