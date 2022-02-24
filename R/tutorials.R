@@ -4,18 +4,14 @@
 
 # Load packages ----
 
+library(tidyverse)
+
 # Population structure ----
 
 # Load data
-data <- read_delim(file = "TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.txt")
+data <- vroom::vroom(file = "TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.txt",
+                     col_names = FALSE)
 
-#Define work directory
-setwd("C:/Users/plasserre/Documents/TP_LASSERRE-Z_2021/TD2_Structure/")
+dim(data)  # 1865 genotypes, 12038 markers
 
-data=read.table("geno_filtered_maf005_na010_prunedLD090.txt",header=F)
-
-# How many genotypes, how many markers ?
-dim(data)
-
-# How alleles are coded ?
-table(data[,1], useNA = "always")
+distinct(data[, 1])
