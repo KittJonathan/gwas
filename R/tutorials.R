@@ -38,3 +38,47 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
+
+# Trees
+
+test <- geno %>% 
+  mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
+
+data2 <- geno
+for (c in 1:ncol(data2)){
+  data2[is.na(data2[,c]),c]=mean(x = (data2[,c]),na.rm=T)
+}
+
+
+head(geno)
+
+
+
+
+
+
+
+
+
+################################  TREE #########################################
+
+# Replace NA by minor allele frequency computed as follow:
+for (c in 1:ncol(data)){
+  data[is.na(data[,c]),c]=mean(x = (data[,c]),na.rm=T)
+}
+
+# How works functions nj and dist ?
+# How are computed genetic distances
+
+subset_mk=sample(x = 1:ncol(data),size = 2500,replace = F) # sample of 2500 SNP to lighten the data
+distances=dist(as.matrix(data[,subset_mk]))
+arbol <- nj(distances)
+
+tree=hclust(distances,method = "ward.D2")
+plot(tree)
+rect.hclust(tree,k=3)
+tree <- HCPC(res = as.matrix(data[, subset_mk]))
+
+par(mfrow=c(1,1)) # put graphs on 1 row by 2 columns
+# visualization of the tree
+plot(arbol,"unrooted", cex=0.5)
