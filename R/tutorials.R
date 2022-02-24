@@ -5,8 +5,8 @@
 # Load packages ----
 
 library(tidyverse)
-library(tidylog)
-library(patchwork)
+library(ape)
+
 
 # Population structure ----
 
@@ -41,12 +41,20 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
 
 # Trees
 
-test <- geno %>% 
+geno <- geno %>% 
   mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
 
+subset_markers <- sample(x = 1:ncol(geno), size = 2500, replace = FALSE)
 
+test <- geno %>% 
+  select(subset_markers) %>% 
+  as.matrix() %>% 
+  dist()
 
+arbol <- nj(test)
 
+tree <- hclust(test, method = "ward.D2")
+plot(tree)
 
 
 
