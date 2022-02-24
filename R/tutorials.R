@@ -29,11 +29,6 @@ d1 <- geno %>%
   count(marker, allele) %>% 
   mutate(allele = factor(allele))
 
-d1 %>% 
-  filter(marker == "marker1") %>% 
-  ggplot(aes(x = allele, y = n)) +
-  geom_col()
-
 ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
   geom_bar(stat = "identity", position = position_dodge(),
            width = 0.5) +
@@ -43,24 +38,3 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
-  
-  pivot_longer(names_to = "")
-
-h1 <- ggplot(data = geno, mapping = aes(x = X1)) +
-  geom_histogram(fill = "lightblue")
-
-h1
-
-hist(data$X1, col = "lightblue", main = "Genotypes for 1st marker in total population", xlab = "Genotypes")
-
-ggplot(data = data, mapping = aes(x = X3)) +
-  geom_histogram()
-
-## Visualize total population distribution for 3 firt markers
-par(mfrow=c(2,2)) # put graphs on 1 row by 2 columns
-hist(data$X1,col="lightblue", main = "Genotypes pour le mk 1 dans la population totale",
-     xlab="Genotypes")
-hist(data$X2,col="grey", main = "Genotypes pour le mk 2 dans la population totale",
-     xlab="Genotypes")
-hist(data$X3,col="plum", main = "Genotypes pour le mk 3 dans la population totale",
-     xlab="Genotypes")
