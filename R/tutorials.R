@@ -65,3 +65,67 @@ ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_minimal()
+
+
+
+
+
+#################################  SNMF ########################################
+
+# open LEA package documentation webpage
+browseVignettes("LEA")
+
+## Method snmf (use a specific genotyping file previously formated)
+obj_snmf<-snmf(input.file = "geno_filtered_maf005_na010_prunedLD090.geno",
+               K = 1:10, repetitions = 1, entropy = T,  
+               ploidy = 2, project = "new",CPU = 2)
+
+# SNMF function options:
+# repetitions: nb of wanted repetitions
+# entropy: "cross-entropy" approach will be applied (TRUE) or not applied (FALSE)
+# ploidy: genotypes are diploides (2) or haploides (1)
+# project: results will be saved and stored in a new directory 
+
+
+### IF DON'T WORK AND CAUSES ERROR ==> DOWNLOAD PROJECT RESULTS
+obj_snmf = load.snmfProject("Structure_snmf_output/geno_filtered_maf005_na010_prunedLD090.snmfProject")
+
+# What are the files that have been created in your work directory ?
+
+# What is allocated in "obj_snmf" object ?
+obj_snmf
+
+# Visualization 
+plot(obj_snmf)
+
+# Q(): head of the admixture coefficients matrix
+head(Q(obj_snmf, K = 3))
+# % d'appartenance de chaque génotype aux 3 groupes
+
+
+# Allocate the admixture coefficients matrix to the object qmatrix of each individual to each genetic group
+qmatrix = Q(obj_snmf, K = 3)
+dim(qmatrix)
+
+# save qmatrix in a "txt" file that will be used in GWAS
+write.table(qmatrix,"structure_K3.txt", row.names=F,col.names = F, quote=F)
+
+my.colors <- c("tomato", "lightblue","gold")
+
+bp=barchart(obj_snmf, K = 3, 
+            border = NA, space = 0,
+            col = my.colors,
+            xlab = "Individuals",
+            ylab = "Ancestry proportions",
+            main = "Ancestry matrix")
+
+axis(1, at = 1:length(bp$order),
+     labels = bp$order, las=1,
+     cex.axis = .4)
+
+
+# What is this loop for ? (must be feasible with dplyr package)
+vec_gr<-NULL
+for (i in 1:nrow(qmatrix)){
+  vec_gr[i]=paste0("Group",which.max(qmatrix[i,]))
+}
