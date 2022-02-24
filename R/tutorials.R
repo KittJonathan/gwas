@@ -58,22 +58,16 @@ pca_fit %>%
         panel.grid.minor.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
+d1 <- augment(pca_fit, data = geno)
+
+ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme_minimal()
+
 #################################  ACP #########################################
 
-# How works function CA ? What are the outputs ?
-acp<-CA(geno,graph = F)
-acp
-
-# Eigen values
-kable<- (acp$eig)
-## head of the table
-kable[1:10,]
-
-# eigen values barplot
-barplot(acp$eig[1:20,1], ylab="Eigen values")
-
-# % of explained variance barplot
-barplot(acp$eig[1:20,2], ylab="% explianed variance")	
 
 ## Factorial plan graphs
 # Genotypes graph
