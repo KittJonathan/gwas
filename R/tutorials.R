@@ -44,13 +44,6 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
 test <- geno %>% 
   mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
 
-data2 <- geno
-for (c in 1:ncol(data2)){
-  data2[is.na(data2[,c]),c]=mean(x = (data2[,c]),na.rm=T)
-}
-
-
-head(geno)
 
 
 
