@@ -6,6 +6,7 @@
 
 library(tidyverse)
 library(ape)
+library(ggtree)
 
 
 # Population structure ----
@@ -39,42 +40,33 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
   theme(panel.grid.major.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
-# Trees
+#################################  ACP #########################################
 
-geno <- geno %>% 
-  mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
+# How works function CA ? What are the outputs ?
+acp<-CA(data,graph = F)
+acp
 
-subset_markers <- sample(x = 1:ncol(geno), size = 2500, replace = FALSE)
+# Eigen values
+kable<- (acp$eig)
+## head of the table
+kable[1:10,]
 
-test <- geno %>% 
-  select(subset_markers) %>% 
-  as.matrix() %>% 
-  dist()
+# eigen values barplot
+barplot(acp$eig[1:20,1], ylab="Eigen values")
 
-arbol <- nj(test)
+# % of explained variance barplot
+barplot(acp$eig[1:20,2], ylab="% explianed variance")	
 
-tree <- hclust(test, method = "ward.D2")
-plot(tree)
+## Factorial plan graphs
+# Genotypes graph
 
-
-
-
-
-
-################################  TREE #########################################
-
-# How works functions nj and dist ?
-# How are computed genetic distances
-
-subset_mk=sample(x = 1:ncol(data),size = 2500,replace = F) # sample of 2500 SNP to lighten the data
-distances=dist(as.matrix(data[,subset_mk]))
-arbol <- nj(distances)
-
-tree=hclust(distances,method = "ward.D2")
-plot(tree)
-rect.hclust(tree,k=3)
-tree <- HCPC(res = as.matrix(data[, subset_mk]))
-
-par(mfrow=c(1,1)) # put graphs on 1 row by 2 columns
-# visualization of the tree
-plot(arbol,"unrooted", cex=0.5)
+plot(acp$row$coord[,"Dim 1"],	# Dim 1 is X axe
+     acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
+     main= "Genetic diversity",	# title
+     pch=16,				# symbol circle
+     cex=.5,				# half size symbol
+     asp=1,       # orthonormal basis
+     xlab="Axe 1",
+     ylab="Axe 2"
+)
+abline(h=0,v=0,lty=2)			# adding lines
