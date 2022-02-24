@@ -55,11 +55,6 @@ test <- geno %>%
 
 ################################  TREE #########################################
 
-# Replace NA by minor allele frequency computed as follow:
-for (c in 1:ncol(data)){
-  data[is.na(data[,c]),c]=mean(x = (data[,c]),na.rm=T)
-}
-
 # How works functions nj and dist ?
 # How are computed genetic distances
 
