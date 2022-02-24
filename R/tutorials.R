@@ -6,7 +6,8 @@
 
 library(tidyverse)
 library(ape)
-library(ggtree)
+library(broom)
+library(FactoMineR)
 
 
 # Population structure ----
@@ -40,10 +41,27 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +
   theme(panel.grid.major.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
+# PCA
+
+pca_fit <- prcomp(geno)
+
+pca_fit %>% 
+  tidy(matrix = "eigenvalues") %>% 
+  filter(PC %in% 1:20) %>% 
+  ggplot(mapping = aes(x = PC, y = percent)) +
+  geom_col(fill = "#56B4E9", alpha = 0.8) +
+  ggtitle("% of variance explained") +
+  scale_y_continuous(labels = scales::percent_format(),
+                     expand = expansion(mult = c(0, 0.01))) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
 #################################  ACP #########################################
 
 # How works function CA ? What are the outputs ?
-acp<-CA(data,graph = F)
+acp<-CA(geno,graph = F)
 acp
 
 # Eigen values
