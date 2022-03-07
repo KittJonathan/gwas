@@ -58,28 +58,15 @@ arbol <- nj(distances)  # neighbour-joining tree estimation
 
 ggtree(tr = arbol, layout = "ape")  # View tree
 
-################################  TREE #########################################
+tree <- hclust(distances, method = "ward.D2")  # hierarchical clustering
 
-# Replace NA by minor allele frequency computed as follow:
-# for (c in 1:ncol(data)){
-#   data[is.na(data[,c]),c]=mean(x = (data[,c]),na.rm=T)
-# }
+ggtree(tr = tree, layout = "dendrogram")  # View hierarchical tree
 
-# How works functions nj and dist ?
-# How are computed genetic distances
-
-# subset_mk=sample(x = 1:ncol(data),size = 2500,replace = F) # sample of 2500 SNP to lighten the data
-# distances=dist(as.matrix(data[,subset_mk]))
-# arbol <- nj(distances)
-
-tree=hclust(distances,method = "ward.D2")
+plot.new()
 plot(tree)
-rect.hclust(tree,k=3)
-tree <- HCPC(res = as.matrix(data[, subset_mk]))
+rect.hclust(tree = tree, k = 3)
 
-par(mfrow=c(1,1)) # put graphs on 1 row by 2 columns
-# visualization of the tree
-# plot(arbol,"unrooted", cex=0.5)
+tree <- HCPC(res = as.matrix(subset_mk))
 
 # PCA
 
