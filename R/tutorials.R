@@ -41,12 +41,19 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +  # initiate
   theme(panel.grid.major.x = element_blank(),  # remove major x-axis grid
         plot.title = element_text(hjust = 0.5))  # center title
 
+# Tree
+
+geno <- geno %>% 
+  mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  # replace NAs by MAFs
+
+
+
 ################################  TREE #########################################
 
 # Replace NA by minor allele frequency computed as follow:
-for (c in 1:ncol(data)){
-  data[is.na(data[,c]),c]=mean(x = (data[,c]),na.rm=T)
-}
+# for (c in 1:ncol(data)){
+#   data[is.na(data[,c]),c]=mean(x = (data[,c]),na.rm=T)
+# }
 
 # How works functions nj and dist ?
 # How are computed genetic distances
