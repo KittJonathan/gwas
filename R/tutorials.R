@@ -93,6 +93,37 @@ ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_minimal()
 
+#################################  ACP #########################################
+
+# How works function CA ? What are the outputs ?
+acp<-CA(geno,graph = F)
+acp
+
+# Eigen values
+kable<- (acp$eig)
+## head of the table
+kable[1:10,]
+
+# eigen values barplot
+barplot(acp$eig[1:20,1], ylab="Eigen values")
+
+# % of explained variance barplot
+barplot(acp$eig[1:20,2], ylab="% explianed variance")	
+
+## Factorial plan graphs
+# Genotypes graph
+
+plot(acp$row$coord[,"Dim 1"],	# Dim 1 is X axe
+     acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
+     main= "Genetic diversity",	# title
+     pch=16,				# symbol circle
+     cex=.5,				# half size symbol
+     asp=1,       # orthonormal basis
+     xlab="Axe 1",
+     ylab="Axe 2"
+)
+abline(h=0,v=0,lty=2)			# adding lines
+
 
 
 
