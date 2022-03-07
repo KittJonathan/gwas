@@ -8,6 +8,7 @@ library(tidyverse)
 library(ape)
 library(broom)
 library(FactoMineR)
+library(ggtree)
 
 
 # Population structure ----
@@ -46,7 +47,16 @@ ggplot(data = d1, mapping = aes(x = marker, y = n, fill = allele)) +  # initiate
 geno <- geno %>% 
   mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  # replace NAs by MAFs
 
+subset_mk <- geno %>% 
+  select(sample(x = 1:ncol(.), size = 2500, replace = FALSE))  # sample 2500 markers
 
+distances <- subset_mk %>% 
+  as.matrix() %>% 
+  dist()  # calculate distance matrix
+
+arbol <- nj(distances)  # neighbour-joining tree estimation
+
+ggtree(tr = arbol, layout = "ape")  # View tree
 
 ################################  TREE #########################################
 
@@ -58,9 +68,9 @@ geno <- geno %>%
 # How works functions nj and dist ?
 # How are computed genetic distances
 
-subset_mk=sample(x = 1:ncol(data),size = 2500,replace = F) # sample of 2500 SNP to lighten the data
-distances=dist(as.matrix(data[,subset_mk]))
-arbol <- nj(distances)
+# subset_mk=sample(x = 1:ncol(data),size = 2500,replace = F) # sample of 2500 SNP to lighten the data
+# distances=dist(as.matrix(data[,subset_mk]))
+# arbol <- nj(distances)
 
 tree=hclust(distances,method = "ward.D2")
 plot(tree)
@@ -69,7 +79,7 @@ tree <- HCPC(res = as.matrix(data[, subset_mk]))
 
 par(mfrow=c(1,1)) # put graphs on 1 row by 2 columns
 # visualization of the tree
-plot(arbol,"unrooted", cex=0.5)
+# plot(arbol,"unrooted", cex=0.5)
 
 # PCA
 
