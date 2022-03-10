@@ -118,6 +118,7 @@ cross_entropies <- tibble(
 cross_entropies %>% 
   ggplot(aes(x = k, y = ce)) +
   geom_point() +
+  geom_line() +
   labs(x = "Number of ancestral populations",
        y = "Cross-entropy") +
   theme_minimal()
