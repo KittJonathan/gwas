@@ -9,6 +9,7 @@ library(ape)
 library(broom)
 library(FactoMineR)
 library(ggtree)
+library(LEA)
 
 
 # Population structure ----
