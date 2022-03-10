@@ -95,6 +95,35 @@ ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_minimal()
 
+# SNMF
+
+snmf_object <- snmf(input.file = "TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.geno",
+                    K = 1:10, repetitions = 1, entropy = TRUE,
+                    ploidy = 2, project = "new", CPU = 2)
+
+snmf_object <- load.snmfProject("TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.snmfProject")
+
+plot(snmf_object)
+
+ce_values <- list()
+
+for (i in 1:10) {
+  ce_values[[i]] <- cross.entropy(snmf_object, K = i)
+}
+
+cross_entropies <- tibble(
+  k = 1:10,
+  ce = unlist(ce_values))
+
+cross_entropies %>% 
+  ggplot(aes(x = k, y = ce)) +
+  geom_point() +
+  labs(x = "Number of ancestral populations",
+       y = "Cross-entropy") +
+  theme_minimal()
+
+
+
 #################################  SNMF ########################################
 
 # open LEA package documentation webpage
