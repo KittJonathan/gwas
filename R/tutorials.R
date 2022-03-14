@@ -164,3 +164,41 @@ bp=barchart(snmf_object, K = 3,
 axis(1, at = 1:length(bp$order),
      labels = bp$order, las=1,
      cex.axis = .4)
+
+# Add info given by SNMF on PCA graph
+
+snmf_groups <- admixture %>% 
+  group_by(individual) %>% 
+  filter(row_number() == 1) %>% 
+  select(individual, group = likely_assignment) %>% 
+  ungroup() %>% 
+  mutate(individual = fct_inseq(individual),
+         group = str_remove(group, "group_")) %>% 
+  mutate(group = fct_inseq(group)) %>% 
+  arrange(individual)
+
+snmf_groups
+
+
+
+
+################### Add info given by snmf on PCA graph ############
+
+# What is doing cbind function ?
+data<-cbind(Group=vec_gr,data)
+
+dim(data)
+#Do dimensions have changed ?
+
+
+plot( acp$row$coord[,"Dim 1"],	# Dim 1 is X axe 
+      acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
+      main= "Genetic diversity",	# title
+      pch=16,				# circle symbole 
+      cex=.5,				# half size symbole 
+      asp=1,       # orthonormal basis
+      xlab="Axe 1",
+      ylab="Axe 2",
+      col=c("red", "green", "blue")[as.numeric(as.factor(data[,"Group"]))] # colours by group
+)	
+abline(h=0,v=0,lty=2)			# adding axes
