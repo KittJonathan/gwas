@@ -81,26 +81,38 @@ hc_tree <- hclust(d = distances, method = "ward.D2")
 ggtree(tr = hc_tree, 
        layout = "dendrogram")
 
+# Conduct Principal Component Analysis ----
 
-################################  TREE #########################################
+pca_fit <- prcomp(genotyping_data)
 
-arbol <- nj(distances)
+pca_fit <- prcomp(geno)
 
-tree=hclust(distances,method = "ward.D2")
-plot(tree)
-rect.hclust(tree,k=3)
-tree <- HCPC(res = as.matrix(data[, subset_mk]))
+pca_fit %>% 
+  tidy(matrix = "eigenvalues") %>% 
+  filter(PC %in% 1:20) %>% 
+  ggplot(mapping = aes(x = PC, y = percent)) +
+  geom_col(fill = "#56B4E9", alpha = 0.8) +
+  ggtitle("% of variance explained") +
+  scale_y_continuous(labels = scales::percent_format(),
+                     expand = expansion(mult = c(0, 0.01))) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_blank())
 
-par(mfrow=c(1,1)) # put graphs on 1 row by 2 columns
-# visualization of the tree
-plot(arbol,"unrooted", cex=0.5)
+d1 <- augment(pca_fit, data = geno)
+
+ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme_minimal()
+
+
 
 
 #################################  ACP #########################################
-
-# How works function CA ? What are the outputs ?
-acp<-CA(data,graph = F)
-acp
 
 # Eigen values
 kable<- (acp$eig)
