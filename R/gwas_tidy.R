@@ -21,22 +21,40 @@ library(FactoMineR)
 library(ape)
 library(LEA)
 library(tidyverse)
+library(vroom)
 
+# Import genotyping data ----
+
+genotyping_data <- vroom(file = "data/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.txt",
+                         col_names = FALSE)
+
+# Clean genotyping data ----
+
+genotyping_data_long <- genotyping_data %>% 
+  rowid_to_column() %>%  # add rowid
+  pivot_longer(-rowid,  # transform table into long format
+               names_to = "marker",
+               values_to = "genotype") %>% 
+  rename(individual = rowid) %>%  # rename first column
+  mutate(marker = str_remove(string = marker,  # remove "X" from marker column
+                             pattern = "X")) %>% 
+  mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
+         marker = fct_inseq(f = factor(marker)),
+         genotype = factor(x = genotype,
+                           levels = c(0, 1, NA)))
+
+head(genotyping_data_long)
+  
+
+d1 <- geno %>% 
+  select(marker1 = X1, marker2 = X2, marker3 = X3) %>%  # select and rename first 3 markers 
+  tibble::add_column(genotype = 1:nrow(.), .before = "marker1") %>%  # add row with genotype number 
+  pivot_longer(-genotype, names_to = "marker", values_to = "allele") %>%  # long format 
+  filter(!is.na(allele)) %>%  # remove missing data 
+  count(marker, allele) %>%  # count number of alleles for each marker
+  mutate(allele = factor(allele))  # allele as factor
 
 ################################################
-
-
-#######################  DATA loading ################################
-## set seed for sample function
-set.seed(1)
-
-#Define work directory
-setwd("C:/Users/plasserre/Documents/TP_LASSERRE-Z_2021/TD2_Structure/")
-
-data=read.table("geno_filtered_maf005_na010_prunedLD090.txt",header=F)
-
-# How many genotypes, how many markers ?
-dim(data)
 
 # How alleles are coded ?
 table(data[,1], useNA = "always")
