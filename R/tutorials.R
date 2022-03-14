@@ -119,18 +119,18 @@ cross_entropies %>%
   ggplot(aes(x = k, y = ce)) +
   geom_point() +
   geom_line() +
+  scale_x_continuous(breaks = 1:10) +
   labs(x = "Number of ancestral populations",
        y = "Cross-entropy") +
-  theme_minimal()
+  theme_minimal() +
+  theme(panel.grid.minor.x = element_blank())
+
+head(Q(snmf_object, K = 3))
 
 
 
 #################################  SNMF ########################################
 
-
-# Q(): head of the admixture coefficients matrix
-head(Q(obj_snmf, K = 3))
-# % d'appartenance de chaque génotype aux 3 groupes
 
 
 # Allocate the admixture coefficients matrix to the object qmatrix of each individual to each genetic group
