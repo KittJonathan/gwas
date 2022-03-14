@@ -43,11 +43,12 @@ rm(col.names)
 genotyping_data %>% 
   select(individual:marker_3) %>%   # keep data for the first three markers
   pivot_longer(-individual, names_to = "marker", values_to = "allele") %>%   # long format
-  
-
-  filter(marker %in% 1:3,  
-         !is.na(allele)) %>%  # remove missing data 
-  count(marker, allele) %>%  # count number of individuals for each marker and allele 
+  filter(!is.na(allele)) %>%  # remove NAs
+  mutate(marker = str_remove(string = marker, pattern = "marker_")) %>%  # remove "marker_" in marker column 
+  mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
+         marker = fct_inseq(f = factor(marker)),
+         allele = factor(allele, levels = c(0, 1))) %>% 
+  count(marker, allele) %>%  # count number of individuals for each marker and allele
   ggplot() +  # initiate ggplot
   geom_bar(aes(x = paste0("Marker ", marker), y = n, fill = allele),  # set x, y and fill for geom_bar()
            stat = "identity", position = position_dodge(),  # set stat and position for geom_bar()
@@ -55,9 +56,14 @@ genotyping_data %>%
   scale_fill_brewer(palette = "Blues") +  # change colours
   labs(title = "Allele distribution for the first three markers",  # add title to plot
        x = "", y = "") +  # remove x and y axis labels
-  theme_minimal() +
-  theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor.y = element_blank())
+  theme_minimal() +  # use minimal ggplot theme
+  theme(panel.grid.major.x = element_blank(),  # remove major grids on x axis
+        panel.grid.minor.y = element_blank())  # remove minor grids on y axis
+  
+  
+
+  count(marker, allele) %>%  # count number of individuals for each marker and allele 
+
   
   
 
