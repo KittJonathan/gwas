@@ -203,3 +203,12 @@ ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
   ggtitle(label = "Genetic diversity") +
   theme_minimal()
+
+list_groups <- snmf_groups %>% 
+  pull(group)
+
+genotype_list <- read_csv("TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/genotype_list.txt") %>% 
+  mutate(group = list_groups)
+
+info <- read_tsv("TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/info_taxoPop_traits_rice.txt") %>% 
+  left_join(genotype_list)
