@@ -161,34 +161,6 @@ bp=barchart(snmf_object, K = 3,
             ylab = "Ancestry proportions",
             main = "Ancestry matrix")
 
-
-#################################  SNMF ########################################
-
-
-
-# Allocate the admixture coefficients matrix to the object qmatrix of each individual to each genetic group
-qmatrix = Q(obj_snmf, K = 3)
-dim(qmatrix)
-
-# save qmatrix in a "txt" file that will be used in GWAS
-write.table(qmatrix,"structure_K3.txt", row.names=F,col.names = F, quote=F)
-
-my.colors <- c("tomato", "lightblue","gold")
-
-bp=barchart(obj_snmf, K = 3, 
-            border = NA, space = 0,
-            col = my.colors,
-            xlab = "Individuals",
-            ylab = "Ancestry proportions",
-            main = "Ancestry matrix")
-
 axis(1, at = 1:length(bp$order),
      labels = bp$order, las=1,
      cex.axis = .4)
-
-
-# What is this loop for ? (must be feasible with dplyr package)
-vec_gr<-NULL
-for (i in 1:nrow(qmatrix)){
-  vec_gr[i]=paste0("Group",which.max(qmatrix[i,]))
-}
