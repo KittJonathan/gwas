@@ -182,37 +182,24 @@ snmf_groups
 pca_coords <- d1 %>% 
   select(individual = .rownames, pc1 = .fittedPC1, pc2 = .fittedPC2) %>% 
   mutate(individual = fct_inseq(individual)) %>% 
-  left_join(snmf_groups)
+  left_join(snmf_groups) %>% 
+  group_by(group) %>% 
+  mutate(group.mean.x = mean(pc1),
+         group.mean.y = mean(pc2)) %>% 
+  ungroup()
 
-ggplot(pca_coords,
-       mapping = aes(x = pc1, y = pc2, colour = group)) +
-  geom_point() +
+ggplot() +
+  geom_point(data = pca_coords,
+             aes(x = pc1, y = pc2, colour = group),
+             show.legend = FALSE) +
   scale_colour_manual(values = c("tomato", "lightblue","gold")) +
+  geom_point(data = pca_coords %>% group_by(group) %>% filter(row_number() == 1),
+             aes(x = group.mean.x, y = group.mean.y),
+             size = 2) +
+  geom_text(data = pca_coords %>% group_by(group) %>% filter(row_number() == 1),
+            aes(x = group.mean.x, y = group.mean.y, label = paste0("Group ", group)),
+            vjust = -0.5, hjust = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0, linetype = "dashed") +
   ggtitle(label = "Genetic diversity") +
   theme_minimal()
-
-
-
-
-################### Add info given by snmf on PCA graph ############
-
-# What is doing cbind function ?
-data<-cbind(Group=vec_gr,data)
-
-dim(data)
-#Do dimensions have changed ?
-
-
-plot( acp$row$coord[,"Dim 1"],	# Dim 1 is X axe 
-      acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
-      main= "Genetic diversity",	# title
-      pch=16,				# circle symbole 
-      cex=.5,				# half size symbole 
-      asp=1,       # orthonormal basis
-      xlab="Axe 1",
-      ylab="Axe 2",
-      col=c("red", "green", "blue")[as.numeric(as.factor(data[,"Group"]))] # colours by group
-)	
-abline(h=0,v=0,lty=2)			# adding axes
