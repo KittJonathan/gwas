@@ -127,6 +127,39 @@ cross_entropies %>%
 
 head(Q(snmf_object, K = 3))
 
+q_matrix <- Q(snmf_object, K = 3) %>% 
+  as_tibble()
+
+dim(q_matrix)
+
+admixture <- q_matrix %>%
+  tibble::rowid_to_column() %>% 
+  rename(individual = rowid, group_1 = V1, group_2 = V2, group_3 = V3) %>% 
+  pivot_longer(-individual, names_to = "group", values_to = "value") %>% 
+  group_by(individual) %>% 
+  mutate(likely_assignment = group[which.max(value)],
+         assignment_prob = max(value)) %>% 
+  arrange(likely_assignment, desc(assignment_prob)) %>% 
+  ungroup() %>% 
+  mutate(individual = forcats::fct_inorder(factor(individual)))
+  
+
+admixture
+
+ggplot(data = admixture) +
+  geom_col(aes(x = individual, y = value, fill = group)) +
+  scale_fill_manual(values = c("tomato", "lightblue", "gold"))
+
+vroom::vroom_write(q_matrix, "TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/structure_k3.txt")
+
+my.colors <- c("tomato", "lightblue","gold")
+
+bp=barchart(snmf_object, K = 3, 
+            border = NA, space = 0,
+            col = my.colors,
+            xlab = "Individuals",
+            ylab = "Ancestry proportions",
+            main = "Ancestry matrix")
 
 
 #################################  SNMF ########################################
