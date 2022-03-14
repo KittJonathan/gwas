@@ -179,6 +179,20 @@ snmf_groups <- admixture %>%
 
 snmf_groups
 
+pca_coords <- d1 %>% 
+  select(individual = .rownames, pc1 = .fittedPC1, pc2 = .fittedPC2) %>% 
+  mutate(individual = fct_inseq(individual)) %>% 
+  left_join(snmf_groups)
+
+ggplot(pca_coords,
+       mapping = aes(x = pc1, y = pc2, colour = group)) +
+  geom_point() +
+  scale_colour_manual(values = c("tomato", "lightblue","gold")) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ggtitle(label = "Genetic diversity") +
+  theme_minimal()
+
 
 
 
