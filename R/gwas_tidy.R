@@ -5,6 +5,7 @@
 # Install CRAN packages ----
 
 # install.packages("ape")
+# install.packages("ggtree)
 # install.packages("FactoMineR")
 # install.packages("tidyverse")
 
@@ -19,6 +20,7 @@
 
 library(FactoMineR)
 library(ape)
+library(ggtree)
 library(LEA)
 library(tidyverse)
 library(vroom)
@@ -60,28 +62,28 @@ distances <- genotyping_data %>%
   select(sample(1:ncol(.), size = 2500, replace = FALSE)) %>%  # sample 2500 markers
   as.matrix() %>%  # transform into matrix
   dist()  # calculate distances
-  
 
-subset_mk <- geno %>% 
-  select(sample(x = 1:ncol(.), size = 2500, replace = FALSE))  # sample 2500 markers
+# Compute neighbor-joining tree estimation ----
 
-distances <- subset_mk %>% 
-  as.matrix() %>% 
-  dist()  # calculate distance matrix
-  
+nj_tree_estimation <- nj(distances)
+
+# View tree ----
+
+ggtree(tr = nj_tree_estimation,
+      layout = "ape")
+
+# Hierarchical clustering ----
+
+hc_tree <- hclust(d = distances, method = "ward.D2")
+
+# View hierarchical clusters ----
+
+ggtree(tr = hc_tree, 
+       layout = "dendrogram")
+
 
 ################################  TREE #########################################
 
-# Replace NA by minor allele frequency computed as follow:
-for (c in 1:ncol(data)){
-  data[is.na(data[,c]),c]=mean(x = (data[,c]),na.rm=T)
-}
-
-# How works functions nj and dist ?
-# How are computed genetic distances
-
-subset_mk=sample(x = 1:ncol(data),size = 2500,replace = F) # sample of 2500 SNP to lighten the data
-distances=dist(as.matrix(data[,subset_mk]))
 arbol <- nj(distances)
 
 tree=hclust(distances,method = "ward.D2")
