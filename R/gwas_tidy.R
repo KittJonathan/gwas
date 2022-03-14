@@ -34,25 +34,32 @@ genotyping_data_long <- genotyping_data %>%
   rowid_to_column() %>%  # add rowid
   pivot_longer(-rowid,  # transform table into long format
                names_to = "marker",
-               values_to = "genotype") %>% 
+               values_to = "allele") %>% 
   rename(individual = rowid) %>%  # rename first column
   mutate(marker = str_remove(string = marker,  # remove "X" from marker column
                              pattern = "X")) %>% 
   mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
          marker = fct_inseq(f = factor(marker)),
-         genotype = factor(x = genotype,
+         allele = factor(x = allele,
                            levels = c(0, 1, NA)))
 
-head(genotyping_data_long)
-  
+# Total population distribution for the first three markers ----
 
-d1 <- geno %>% 
-  select(marker1 = X1, marker2 = X2, marker3 = X3) %>%  # select and rename first 3 markers 
-  tibble::add_column(genotype = 1:nrow(.), .before = "marker1") %>%  # add row with genotype number 
-  pivot_longer(-genotype, names_to = "marker", values_to = "allele") %>%  # long format 
-  filter(!is.na(allele)) %>%  # remove missing data 
-  count(marker, allele) %>%  # count number of alleles for each marker
-  mutate(allele = factor(allele))  # allele as factor
+genotyping_data_long %>% 
+  filter(marker %in% 1:3,  # keep data for the first three markers
+         !is.na(allele)) %>%  # remove missing data 
+  count(marker, allele) %>%  # count number of individuals for each marker and allele 
+  ggplot() +  # initiate ggplot
+  geom_bar(aes(x = paste0("Marker ", marker), y = n, fill = allele),  # set x, y and fill for geom_bar()
+           stat = "identity", position = position_dodge(),  # set stat and position for geom_bar()
+           width = 0.5) +  # reduce bar width  
+  scale_fill_brewer(palette = "Blues") +  # change colours
+  labs(title = "Allele distribution for the first three markers",  # add title to plot
+       x = "", y = "") +  # remove x and y axis labels
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank())
+
 
 ################################################
 
@@ -287,3 +294,4 @@ text(x = gr$`Dim 1`,y=gr$`Dim 2`,cex=1,labels = taxPop$POPULATION,adj = c(1.5,-2
 # colnames(info_2)=c("pericarp_color_num","culm_angle","GENOTYPE")
 # info=merge(info,info_2)
 # write.table(info,"info_classification_traits_rice.txt", row.names=F, col.names=T, sep="\t", quote=F)
+
