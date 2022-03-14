@@ -28,25 +28,14 @@ library(vroom)
 genotyping_data <- vroom(file = "data/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.txt",
                          col_names = FALSE)
 
-# Clean genotyping data ----
-
-names(genotyping_data) <- c(paste0("marker_", 1:ncol(genotyping_data)))
-
-genotyping_data <- genotyping_data %>% 
-  rowid_to_column() %>% 
-  rename(individual = rowid)
-
-rm(col.names)
-
 # Total population distribution for the first three markers ----
 
 genotyping_data %>% 
-  select(individual:marker_3) %>%   # keep data for the first three markers
-  pivot_longer(-individual, names_to = "marker", values_to = "allele") %>%   # long format
+  select(1:3, ) %>%   # keep data for the first three markers
+  pivot_longer(everything(), names_to = "marker", values_to = "allele") %>%   # long format
+  mutate(marker = str_remove(string = marker, pattern = "X")) %>%  # remove "X" in marker name
   filter(!is.na(allele)) %>%  # remove NAs
-  mutate(marker = str_remove(string = marker, pattern = "marker_")) %>%  # remove "marker_" in marker column 
-  mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
-         marker = fct_inseq(f = factor(marker)),
+  mutate(marker = fct_inseq(f = factor(marker)),  # transform variables into factors
          allele = factor(allele, levels = c(0, 1))) %>% 
   count(marker, allele) %>%  # count number of individuals for each marker and allele
   ggplot() +  # initiate ggplot
@@ -59,47 +48,27 @@ genotyping_data %>%
   theme_minimal() +  # use minimal ggplot theme
   theme(panel.grid.major.x = element_blank(),  # remove major grids on x axis
         panel.grid.minor.y = element_blank())  # remove minor grids on y axis
-  
-  
-
-  count(marker, allele) %>%  # count number of individuals for each marker and allele 
-
-  
-  
-
-genotyping_data_long <- genotyping_data %>% 
-  rowid_to_column() %>%  # add rowid
-  pivot_longer(-rowid,  # transform table into long format
-               names_to = "marker",
-               values_to = "allele") %>% 
-  rename(individual = rowid) %>%  # rename first column
-  mutate(marker = str_remove(string = marker,  # remove "X" from marker column
-                             pattern = "X")) %>% 
-  mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
-         marker = fct_inseq(f = factor(marker)),
-         allele = factor(allele, levels = c(0, 1)))
-
-
 
 # Replace NAs by MAF ----
 
 genotyping_data <- genotyping_data %>% 
   mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
 
+# Compute genetic distances for a subset of 2,500 markers ----
 
-test <- genotyping_data_long %>% 
-  filter(marker %in% 1:3)
+distances <- genotyping_data %>% 
+  select(sample(1:ncol(.), size = 2500, replace = FALSE)) %>%  # sample 2500 markers
+  as.matrix() %>%  # transform into matrix
+  dist()  # calculate distances
+  
 
-test <- test %>% 
-  group_by(marker) %>% 
-  mutate(allele_2 = case_when(is.na(allele) ~ mean(as.numeric(allele), na.rm = TRUE),
-                              TRUE ~ as.numeric(allele)))
+subset_mk <- geno %>% 
+  select(sample(x = 1:ncol(.), size = 2500, replace = FALSE))  # sample 2500 markers
 
-genotyping_data_long <- genotyping_data_long %>%
-  group
-
-geno <- geno %>% 
-  # replace NAs by MAFs
+distances <- subset_mk %>% 
+  as.matrix() %>% 
+  dist()  # calculate distance matrix
+  
 
 ################################  TREE #########################################
 
