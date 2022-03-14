@@ -30,23 +30,22 @@ genotyping_data <- vroom(file = "data/TD2_Structure/geno_filtered_maf005_na010_p
 
 # Clean genotyping data ----
 
-genotyping_data_long <- genotyping_data %>% 
-  rowid_to_column() %>%  # add rowid
-  pivot_longer(-rowid,  # transform table into long format
-               names_to = "marker",
-               values_to = "allele") %>% 
-  rename(individual = rowid) %>%  # rename first column
-  mutate(marker = str_remove(string = marker,  # remove "X" from marker column
-                             pattern = "X")) %>% 
-  mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
-         marker = fct_inseq(f = factor(marker)),
-         allele = factor(x = allele,
-                           levels = c(0, 1, NA)))
+names(genotyping_data) <- c(paste0("marker_", 1:ncol(genotyping_data)))
+
+genotyping_data <- genotyping_data %>% 
+  rowid_to_column() %>% 
+  rename(individual = rowid)
+
+rm(col.names)
 
 # Total population distribution for the first three markers ----
 
-genotyping_data_long %>% 
-  filter(marker %in% 1:3,  # keep data for the first three markers
+genotyping_data %>% 
+  select(individual:marker_3) %>%   # keep data for the first three markers
+  pivot_longer(-individual, names_to = "marker", values_to = "allele") %>%   # long format
+  
+
+  filter(marker %in% 1:3,  
          !is.na(allele)) %>%  # remove missing data 
   count(marker, allele) %>%  # count number of individuals for each marker and allele 
   ggplot() +  # initiate ggplot
@@ -59,15 +58,42 @@ genotyping_data_long %>%
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.y = element_blank())
+  
+  
+
+genotyping_data_long <- genotyping_data %>% 
+  rowid_to_column() %>%  # add rowid
+  pivot_longer(-rowid,  # transform table into long format
+               names_to = "marker",
+               values_to = "allele") %>% 
+  rename(individual = rowid) %>%  # rename first column
+  mutate(marker = str_remove(string = marker,  # remove "X" from marker column
+                             pattern = "X")) %>% 
+  mutate(individual = fct_inseq(f = factor(individual)),  # transform variables into factors
+         marker = fct_inseq(f = factor(marker)),
+         allele = factor(allele, levels = c(0, 1)))
+
+
 
 # Replace NAs by MAF ----
 
-genotyping_data_long <- genotyping_data_long %>% 
-  
+genotyping_data <- genotyping_data %>% 
+  mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
 
+
+test <- genotyping_data_long %>% 
+  filter(marker %in% 1:3)
+
+test <- test %>% 
+  group_by(marker) %>% 
+  mutate(allele_2 = case_when(is.na(allele) ~ mean(as.numeric(allele), na.rm = TRUE),
+                              TRUE ~ as.numeric(allele)))
+
+genotyping_data_long <- genotyping_data_long %>%
+  group
 
 geno <- geno %>% 
-  mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  # replace NAs by MAFs
+  # replace NAs by MAFs
 
 ################################  TREE #########################################
 
