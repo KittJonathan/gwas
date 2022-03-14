@@ -60,23 +60,14 @@ genotyping_data_long %>%
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.y = element_blank())
 
+# Replace NAs by MAF ----
 
-################################################
-
-# How alleles are coded ?
-table(data[,1], useNA = "always")
+genotyping_data_long <- genotyping_data_long %>% 
+  
 
 
-################################ Data Visualization ############################
-## Visualize total population distribution for 3 firt markers
-par(mfrow=c(2,2)) # put graphs on 1 row by 2 columns
-hist(as.numeric(data[,1]),col="lightblue", main = "Genotypes pour le mk 1 dans la population totale",
-     xlab="Genotypes")
-hist(as.numeric(data[,2]),col="grey", main = "Genotypes pour le mk 2 dans la population totale",
-     xlab="Genotypes")
-hist(as.numeric(data[,3]),col="plum", main = "Genotypes pour le mk 3 dans la population totale",
-     xlab="Genotypes")
-
+geno <- geno %>% 
+  mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))  # replace NAs by MAFs
 
 ################################  TREE #########################################
 
