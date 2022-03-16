@@ -2,6 +2,10 @@
 
 # Last updated 2022-03-14
 
+# Links ----
+
+# https://luisdva.github.io/rstats/model-cluster-plots/
+
 # Install CRAN packages ----
 
 # install.packages("ape")
@@ -149,22 +153,47 @@ ce_values %>%
   theme(panel.grid.minor.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
+# Extract and save the admixture coefficients table ----
+
+q_matrix <- LEA::Q(object = snmf, K = 3) %>% 
+  as_tibble()
+
+vroom::vroom_write(q_matrix, "data/TD2_Structure/q_matrix_k3.txt")
+
+# Assign groups to individuals ----
+
+group_assignment <- q_matrix %>%
+  tibble::rowid_to_column() %>% 
+  pivot_longer(-rowid, names_to = "group", values_to = "prob") %>% 
+  rename(individual = rowid) %>% 
+  mutate(group = str_remove(group, "V")) %>% 
+  mutate(individual = fct_inseq(factor(individual)),
+         group = fct_inseq(factor(group))) %>% 
+  group_by(individual) %>% 
+  mutate(assigned_group = group[which.max(prob)],
+         assigned_prob = max(prob)) %>% 
+  arrange(assigned_group, desc(assigned_prob))
+
+ggplot(data = group_assignment) +
+  geom_col(aes(x = individual, y = prob, fill = group)) +
+  scale_fill_manual(values = c("lightblue", "tomato", "gold"))
+  # scale_fill_manual(values = c("tomato", "lightblue", "gold")) 
+  
+
+my.colors <- c("tomato", "lightblue","gold")
+bp=barchart(snmf, K = 3, 
+            border = NA, space = 0,
+            col = my.colors,
+            xlab = "Individuals",
+            ylab = "Ancestry proportions",
+            main = "Ancestry matrix")
+
+
+
 
 
 #################################  SNMF ########################################
 
-
-# Visualization 
-plot(snmf)
-
-# Q(): head of the admixture coefficients matrix
-head(Q(obj_snmf, K = 3))
-# % d'appartenance de chaque génotype aux 3 groupes
-
-
-# Allocate the admixture coefficients matrix to the object qmatrix of each individual to each genetic group
-qmatrix = Q(obj_snmf, K = 3)
-dim(qmatrix)
 
 # save qmatrix in a "txt" file that will be used in GWAS
 write.table(qmatrix,"structure_K3.txt", row.names=F,col.names = F, quote=F)
