@@ -109,36 +109,15 @@ ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
   labs(title = "Genetic diversity", x = "PC1", y = "PC2") +
   theme_minimal()
 
+# Estimate individual ancestry coefficients and ancestral allele frequencies ----
 
-
-
-#################################  ACP #########################################
-
-# Eigen values
-kable<- (acp$eig)
-## head of the table
-kable[1:10,]
-
-# eigen values barplot
-barplot(acp$eig[1:20,1], ylab="Eigen values")
-
-# % of explained variance barplot
-barplot(acp$eig[1:20,2], ylab="% explianed variance")	
-
-## Factorial plan graphs
-# Genotypes graph
-
-plot(acp$row$coord[,"Dim 1"],	# Dim 1 is X axe
-     acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
-     main= "Genetic diversity",	# title
-     pch=16,				# symbol circle
-     cex=.5,				# half size symbol
-     asp=1,       # orthonormal basis
-     xlab="Axe 1",
-     ylab="Axe 2"
-)
-abline(h=0,v=0,lty=2)			# adding lines
-
+LEA::snmf(input.file = "data/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.geno",
+          K = 1:10,
+          repetitions = 1,
+          entropy = TRUE,
+          ploidy = 2,
+          project = "new",
+          CPU = 2)
 
 #################################  SNMF ########################################
 
