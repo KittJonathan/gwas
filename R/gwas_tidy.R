@@ -123,6 +123,34 @@ LEA::snmf(input.file = "data/TD2_Structure/geno_filtered_maf005_na010_prunedLD09
 
 snmf <- load.snmfProject("data/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.snmfProject")
 
+# Extract cross-entropy values ----
+
+ce_list <- list()
+
+for (i in 1:length(snmf@runs)) {
+  
+  ce_list[[i]] <- LEA::cross.entropy(object = snmf, K = i)
+  
+}
+
+ce_values <- tibble(
+  k = 1:length(snmf@runs),
+  ce_value = unlist(ce_list))
+
+ce_values %>% 
+  ggplot(mapping = aes(x = k, y = ce_value)) +
+  geom_point(colour = "#56B4E9") +
+  geom_line(colour = "#56B4E9") +
+  scale_x_continuous(breaks = 1:length(snmf@runs)) +
+  ggtitle("Cross-entropy") +
+  labs(x = "Number of ancestral populations",
+       y = "Cross-entropy") +
+  theme_minimal() +
+  theme(panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
+
+
 #################################  SNMF ########################################
 
 
