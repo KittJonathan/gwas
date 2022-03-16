@@ -23,3 +23,6 @@ snpgdsSummary(snpgdsExampleFileName())
 
 # Open a GDS file
 genofile <- snpgdsOpen(snpgdsExampleFileName())
+
+# Get the attributes of chromosome coding
+get.attr.gdsn(index.gdsn(genofile, "snp.chromosome"))

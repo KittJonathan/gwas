@@ -119,33 +119,15 @@ LEA::snmf(input.file = "data/TD2_Structure/geno_filtered_maf005_na010_prunedLD09
           project = "new",
           CPU = 2)
 
+# Import the Sparse Non-negative Matrix Factorization algorithm results ----
+
+snmf <- load.snmfProject("data/TD2_Structure/geno_filtered_maf005_na010_prunedLD090.snmfProject")
+
 #################################  SNMF ########################################
 
-# open LEA package documentation webpage
-browseVignettes("LEA")
-
-## Method snmf (use a specific genotyping file previously formated)
-obj_snmf<-snmf(input.file = "geno_filtered_maf005_na010_prunedLD090.geno",
-               K = 1:10, repetitions = 1, entropy = T,  
-               ploidy = 2, project = "new",CPU = 2)
-
-# SNMF function options:
-# repetitions: nb of wanted repetitions
-# entropy: "cross-entropy" approach will be applied (TRUE) or not applied (FALSE)
-# ploidy: genotypes are diploides (2) or haploides (1)
-# project: results will be saved and stored in a new directory 
-
-
-### IF DON'T WORK AND CAUSES ERROR ==> DOWNLOAD PROJECT RESULTS
-obj_snmf = load.snmfProject("Structure_snmf_output/geno_filtered_maf005_na010_prunedLD090.snmfProject")
-
-# What are the files that have been created in your work directory ?
-
-# What is allocated in "obj_snmf" object ?
-obj_snmf
 
 # Visualization 
-plot(obj_snmf)
+plot(snmf)
 
 # Q(): head of the admixture coefficients matrix
 head(Q(obj_snmf, K = 3))
