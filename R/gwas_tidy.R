@@ -24,6 +24,7 @@ library(ggtree)
 library(LEA)
 library(tidyverse)
 library(vroom)
+library(broom)
 
 # Import genotyping data ----
 
@@ -85,8 +86,6 @@ ggtree(tr = hc_tree,
 
 pca_fit <- prcomp(genotyping_data)
 
-pca_fit <- prcomp(geno)
-
 pca_fit %>% 
   tidy(matrix = "eigenvalues") %>% 
   filter(PC %in% 1:20) %>% 
@@ -101,12 +100,13 @@ pca_fit %>%
         plot.title = element_text(hjust = 0.5),
         axis.title.y = element_blank())
 
-d1 <- augment(pca_fit, data = geno)
+d1 <- augment(pca_fit, data = genotyping_data)
 
 ggplot(d1, mapping = aes(.fittedPC1, .fittedPC2)) +
   geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(title = "Genetic diversity", x = "PC1", y = "PC2") +
   theme_minimal()
 
 
