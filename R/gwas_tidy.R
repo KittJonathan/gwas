@@ -20,6 +20,8 @@
 # 
 # BiocManager::install("LEA")
 
+BiocManager::install("trio")
+
 # Load packages ----
 
 library(FactoMineR)
@@ -29,6 +31,20 @@ library(LEA)
 library(tidyverse)
 library(vroom)
 library(broom)
+library(trio)
+
+# Import .ped and .fam files ----
+
+test <- read.pedfile(file = "data/transfer_2986650_files_a7f88f43/geno.ped")
+test <- snpStats::read.pedfile("data/transfer_2986650_files_a7f88f43/geno.ped")
+
+map_file <- vroom("data/transfer_2986650_files_a7f88f43/geno.map", col_names = FALSE)
+# X1 = chromosome
+# X2 = SNP
+# X3 = Genetic Distance
+# X4 = Position
+
+ped_file <- vroom::vroom("data/transfer_2986650_files_a7f88f43/geno.ped")
 
 # Import genotyping data ----
 
