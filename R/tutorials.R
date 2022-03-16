@@ -154,7 +154,7 @@ vroom::vroom_write(q_matrix, "TD_Structure_et_GWAS1/TD2_Structure/TD2_Structure/
 
 my.colors <- c("tomato", "lightblue","gold")
 
-bp=barchart(snmf_object, K = 3, 
+bp=barchart(snmf, K = 3, 
             border = NA, space = 0,
             col = my.colors,
             xlab = "Individuals",
