@@ -190,6 +190,8 @@ group_assignment <- q_matrix %>%
          assigned_prob = max(prob)) %>% 
   arrange(assigned_group, desc(assigned_prob))
 
+# Admixture plot ----
+
 ggplot(data = group_assignment) +
   geom_col(aes(x = individual, y = prob, fill = group)) +
   scale_fill_manual(values = c("lightblue", "tomato", "gold"))
@@ -197,26 +199,8 @@ ggplot(data = group_assignment) +
   
 
 my.colors <- c("tomato", "lightblue","gold")
+
 bp=barchart(snmf, K = 3, 
-            border = NA, space = 0,
-            col = my.colors,
-            xlab = "Individuals",
-            ylab = "Ancestry proportions",
-            main = "Ancestry matrix")
-
-
-
-
-
-#################################  SNMF ########################################
-
-
-# save qmatrix in a "txt" file that will be used in GWAS
-write.table(qmatrix,"structure_K3.txt", row.names=F,col.names = F, quote=F)
-
-my.colors <- c("tomato", "lightblue","gold")
-
-bp=barchart(obj_snmf, K = 3, 
             border = NA, space = 0,
             col = my.colors,
             xlab = "Individuals",
@@ -227,53 +211,38 @@ axis(1, at = 1:length(bp$order),
      labels = bp$order, las=1,
      cex.axis = .4)
 
+# Add snmf groups to PCA data ----
 
-# What is this loop for ? (must be feasible with dplyr package)
-vec_gr<-NULL
-for (i in 1:nrow(qmatrix)){
-  vec_gr[i]=paste0("Group",which.max(qmatrix[i,]))
-}
+groups_summary <- group_assignment %>% 
+  group_by(individual) %>% 
+  filter(row_number() == 1) %>% 
+  select(individual, assigned_group)
 
+pca_groups <- d1 %>% 
+  rename(individual = .rownames) %>% 
+  left_join(groups_summary)
 
-################### Add info given by snmf on PCA graph ############
+# Plot PCA results with SNMF groups ----
 
-# What is doing cbind function ?
-data<-cbind(Group=vec_gr,data)
+ggplot(pca_groups, mapping = aes(.fittedPC1, .fittedPC2)) +
+  geom_point(aes(colour = assigned_group)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(title = "Genetic diversity", x = "PC1", y = "PC2") +
+  theme_minimal()
 
-dim(data)
-#Do dimensions have changed ?
+# Add complementary informations about rice genotypes to study ----
 
+info <- read_tsv("data/TD2_Structure/info_taxoPop_traits_rice.txt")
 
-plot( acp$row$coord[,"Dim 1"],	# Dim 1 is X axe 
-      acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
-      main= "Genetic diversity",	# title
-      pch=16,				# circle symbole 
-      cex=.5,				# half size symbole 
-      asp=1,       # orthonormal basis
-      xlab="Axe 1",
-      ylab="Axe 2",
-      col=c("red", "green", "blue")[as.numeric(as.factor(data[,"Group"]))] # colours by group
-)	
-abline(h=0,v=0,lty=2)			# adding axes
+genotypes_list <- read_csv("data/TD2_Structure/genotype_list.txt") %>% 
+  left_join(info) %>% 
+  rowid_to_column() %>% 
+  rename(individual = rowid) %>% 
+  mutate(individual = factor(individual)) %>% 
+  left_join(groups_summary)
 
-
-gr<- aggregate(acp$row$coord,	# factors coordinates table 
-               FUN="mean",		# compute mean ...
-               by=list(data[,"Group"]))	# ...per genetic group
-
-points(x = gr$`Dim 1`,y=gr$`Dim 2`,cex=2,pch=20)  #add points
-text(x = gr$`Dim 1`,y=gr$`Dim 2`,cex=1,labels = c("Group1","Group2","Group3"),adj = c(1.5,-2)) # add point labels
-
-
-
-### combine complementary informations about rice genotypes to previous study
-
-genotypes_list=read.table("genotype_list.txt",header=T) # genotypes list
-genotypes_list=cbind(genotypes_list,Group=vec_gr) # join "group" information (cbind cause same order but be careful!)
-
-info=read.table("info_taxoPop_traits_rice.txt", header=T) # load complementary info
-
-info=merge(info,genotypes_list) #join two tables
+# Calculate mean membership of each taxonomic population to each genetic group ----
 
 
 ### To which taxonomic population are matching genetic groups 1, 2 and 3 ? 
