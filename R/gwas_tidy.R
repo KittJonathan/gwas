@@ -244,32 +244,41 @@ genotypes_list <- read_csv("data/TD2_Structure/genotype_list.txt") %>%
 
 # Calculate mean membership of each taxonomic population to each genetic group ----
 
+tax_pop <- genotypes_list %>% 
+  group_by(assigned_group, POPULATION) %>% 
+  summarise(count = n()) %>% 
+  mutate(mean_membership = count / sum(count)) %>% 
+  filter(mean_membership == max(mean_membership))
 
-### To which taxonomic population are matching genetic groups 1, 2 and 3 ? 
-# calculate the mean membership of each taxonomic population to each genetic group
-for (gr in sort(unique(info$Group))){
+for (gr in sort(unique(genotypes_list$assigned_group))){
   cat(gr)
-  print(table(info[info$Group==gr,"POPULATION"])/length(info[info$Group==gr,"POPULATION"]))
+  print(table(info[genotypes_list$assigned_group == gr,"POPULATION"])/length(genotypes_list[genotypes_list$assigned_group==gr,"POPULATION"]))
   cat("\n\n")
 }
-# with dplyr:
-info%>%group_by(Group,POPULATION)%>%summarise(count=n())%>%mutate(mean_membership=count/sum(count))
 
-taxPop=data.frame(info%>%group_by(Group,POPULATION)%>%summarise(count=n())%>%
-                    mutate(mean_membership=count/sum(count))%>%filter(mean_membership==max(mean_membership)))
+# Pericarp colour ----
 
-### What do you notice concerning pericarp colour ? Comment
-info%>%filter(!is.na(pericarp_color))%>%
-  group_by(Group,pericarp_color)%>%summarise(count=n())%>%mutate(mean_membership=count/sum(count))
+genotypes_list %>% 
+  filter(!is.na(pericarp_color)) %>% 
+  group_by(assigned_group, pericarp_color) %>% 
+  summarise(count = n()) %>% 
+  mutate(mean_membership = count / sum(count))
 
-### What do you notice concerning culm angle distribution by genetic group?
-# Comment  (scale 1 erected to 9 no erected)
-info%>%filter(culm_angle!=-9)%>%
-  group_by(Group,culm_angle)%>%summarise(count=n())%>%mutate(mean_membership=count/sum(count))
+# Culm angle distribution by genetic group ----
 
-## visualization with ggplot2
-info%>%filter(culm_angle!=-9)%>%group_by(Group)%>%ggplot(aes(Group,culm_angle))+geom_boxplot()
+genotypes_list %>% 
+  filter(culm_angle != -9) %>% 
+  group_by(assigned_group, culm_angle) %>% 
+  summarise(count = n()) %>% 
+  mutate(mean_membership = count / sum(count))
 
+# Generate boxplot ----
+
+genotypes_list %>% 
+  filter(culm_angle != -9) %>% 
+  group_by(assigned_group) %>% 
+  ggplot(aes(assigned_group, culm_angle)) +
+  geom_boxplot()
 
 
 ########################## ACP graph with taxonomic info on groups ################
