@@ -480,10 +480,21 @@ ggplot(data = structure_res_table,
        y = "culm angle log10 pval") +
   ggtitle("Manhattan plot for culm angle color with structure corrected model")
 
+# Select most associated SNP ----
 
+asso_snp <- structure_res_table %>% 
+  filter(pericarp_log10_pval == max(pericarp_log10_pval)) %>% 
+  pull(SNP)
 
+# Create contingency table ----
 
+allelic_effect <- d1 %>% 
+  select(pericarp_color_char, starts_with(asso_snp)) %>% 
+  filter(!is.na(pericarp_color_char)) %>% 
+  rename(snp_218399762_A=`218399762_A`)
+  
+# Generate plot ----
 
+library(vcd)
 
-
-
+mosaic(snp_218399762_A ~ pericarp_color_char, data = allelic_effect)
