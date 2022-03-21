@@ -408,18 +408,82 @@ ggplot(data = naive_res_table,
        y = "culm angle log10 pval") +
   ggtitle("Manhattan plot for culm angle color with naive model")
 
+# Structure corrected association model ----
+
+structure_res_list <- list()
+
+for (i in first_SNP_col:ncol(d1)) {
+  
+  snp <- colnames(d1[i])
+  
+  d1_tmp <- d1 %>% 
+    filter(culm_angle != -9 & pericarp_color != "-9") %>% 
+    select(1:8, i) %>% 
+    rename(SNP = all_of(snp))
+  
+  pericarp_model <- lm(formula = pericarp_color ~ SNP + Group1 + Group2 + Group3, data = d1_tmp)
+  
+  culm_model <- lm(formula = culm_angle ~ SNP + Group1 + Group2 + Group3, data = d1_tmp)
+  
+  pericarp_res <- pericarp_model %>% 
+    tidy() %>% 
+    filter(term == "SNP") %>% 
+    mutate(term = snp) %>% 
+    select(term, pericarp_pval = p.value)
+  
+  culm_res <- culm_model %>% 
+    tidy() %>% 
+    filter(term == "SNP") %>% 
+    mutate(term = snp) %>% 
+    select(term, culm_pval = p.value)
+  
+  structure_res_list[[i]] <- pericarp_res %>% 
+    left_join(culm_res)
+  
+}
+
+structure_res_table <- do.call("rbind", structure_res_list)
+
+# Format structure_res_table and add SNP positions ----
+
+structure_res_table <- structure_res_table %>% 
+  mutate(term = str_sub(string = term, start = 1, end = 9)) %>% 
+  rename(SNP = term) %>% 
+  mutate(pericarp_log10_pval = -log10(pericarp_pval),
+         culm_log10_pval = -log10(culm_pval)) %>% 
+  left_join(pos) %>% 
+  select(SNP, Chromosome:Position, everything())
+
+# Bonferroni correction ----
+
+signif_threshold = -log10(0.001 / ncol(d1))
+
+# Manhattan plot for pericarp color with structure corrected model ----
+
+ggplot(data = structure_res_table,
+       aes(x = Position, y = pericarp_log10_pval)) +
+  geom_point(size = 0.5) +
+  scale_x_continuous(breaks = seq(0, 30e6, 2e6), labels = seq(0, 30, 2)) +
+  geom_hline(yintercept = signif_threshold, colour = "blue", linetype = "dashed") +
+  labs(x = "chromosome 7 positions (Mb)",
+       y = "pericarp log10 pval") +
+  ggtitle("Manhattan plot for pericarp color with structure corrected model")
+
+# Manhattan plot for culm angle with structure corrected model ----
+
+ggplot(data = structure_res_table,
+       aes(x = Position, y = culm_log10_pval)) +
+  geom_point(size = 0.5) +
+  scale_x_continuous(breaks = seq(0, 30e6, 2e6), labels = seq(0, 30, 2)) +
+  geom_hline(yintercept = signif_threshold, colour = "blue", linetype = "dashed") +
+  labs(x = "chromosome 7 positions (Mb)",
+       y = "culm angle log10 pval") +
+  ggtitle("Manhattan plot for culm angle color with structure corrected model")
 
 
 
 
-############################ Manhattan with NAIVE model ########################## 
 
 
-##graph CULM_ANGLE
-ggplot(naive_res_table, aes(Position, culm_log10_pval))+
-  geom_point(stat="identity", size=0.5)+
-  labs(x="chromosome 7 position (Mb)")+
-  scale_x_continuous(labels=seq(0,30, by=2),
-                     breaks=seq(0,30000000, by=2000000))+
-  geom_hline(yintercept = signif_threshold, color="blue")+
-  ggtitle("Manhattan plot for culm angle with NAIVE model")
+
+
