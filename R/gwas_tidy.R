@@ -280,36 +280,26 @@ genotypes_list %>%
   ggplot(aes(assigned_group, culm_angle)) +
   geom_boxplot()
 
+# PCA plot with taxonomy information ----
 
-########################## ACP graph with taxonomic info on groups ################
-plot( acp$row$coord[,"Dim 1"],	# Dim 1 is X axe 
-      acp$row$coord[,"Dim 2"],	# Dim 2 is Y axe
-      main= "Genetic diversity",	# title
-      pch=16,				# circle symbole 
-      cex=.5,				# half size symbole 
-      asp=1,       # orthonormal basis
-      xlab="Axe 1",
-      ylab="Axe 2",
-      col=c("red", "green", "blue")[as.numeric(as.factor(data[,"Group"]))] # colours by group
-)	
-abline(h=0,v=0,lty=2)			# adding axes
+pca_taxo <- d1 %>% 
+  mutate(individual = factor(.rownames)) %>% 
+  select(individual, .fittedPC1, .fittedPC2) %>% 
+  left_join(genotypes_list) %>% 
+  group_by(assigned_group) %>% 
+  mutate(mean_x = mean(.fittedPC1),
+         mean_y = mean(.fittedPC2)) %>% 
+  ungroup()
+  
+pca_taxo
 
-
-gr<- aggregate(acp$row$coord,	# factors coordinates table 
-               FUN="mean",		# compute mean ...
-               by=list(data[,"Group"]))	# ...per genetic group
-
-points(x = gr$`Dim 1`,y=gr$`Dim 2`,cex=2,pch=20)  #add points
-text(x = gr$`Dim 1`,y=gr$`Dim 2`,cex=1,labels = taxPop$POPULATION,adj = c(1.5,-2)) # add point labels
-
-
-
-
-# info_2=read.table("pheno_GWAS_fastlmm_2.txt",header=T)
-# info_2=info_2%>%mutate(GENOTYPE=paste('0_', IID, sep=""))%>%
-#   select(pericarp_color, culm_angle, GENOTYPE)
-# 
-# colnames(info_2)=c("pericarp_color_num","culm_angle","GENOTYPE")
-# info=merge(info,info_2)
-# write.table(info,"info_classification_traits_rice.txt", row.names=F, col.names=T, sep="\t", quote=F)
+ggplot() +
+  geom_point(data = pca_taxo, aes(x = .fittedPC1, y = .fittedPC2,
+                                  colour = assigned_group)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(title = "Genetic diversity", x = "PC1", y = "PC2") +
+  geom_text(data = pca_taxo %>% group_by(assigned_group) %>% filter(row_number() == 1),
+            aes(x = mean_x, y = mean_y, label = POPULATION)) +
+  theme_minimal()
 
