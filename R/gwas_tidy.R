@@ -1,6 +1,6 @@
 # GWAS the Tidy way
 
-# Last updated 2022-03-14
+# Last updated 2022-03-21
 
 # Links ----
 
@@ -303,3 +303,25 @@ ggplot() +
             aes(x = mean_x, y = mean_y, label = POPULATION)) +
   theme_minimal()
 
+
+# Load data for GWAS ----
+
+genotyping_data <- vroom::vroom("data/TD3_GWAS1/GWAS1_2000SNP_01_allele_code.txt") %>% 
+  mutate(IID = paste(FID, IID, sep = "_")) %>% 
+  select(-FID, -(PAT:PHENOTYPE)) %>% 
+  rename(GENOTYPE = IID)
+
+info <- read_tsv("data/TD3_GWAS1/info_taxoPop_traits_rice.txt") %>% 
+  select(-SUBPOPULATION) %>% 
+  rename(pericarp_color_char = pericarp_color) %>% 
+  rename(pericarp_color = pericarp_color_num)
+
+structure <- read_tsv("data/TD3_GWAS1/matrice_covar_structure_K3.txt")
+
+# Merge data ----
+
+d1 <- info %>% 
+  left_join(structure) %>% 
+  left_join(genotyping_data)
+
+rm(genotyping_data, info, structure)
